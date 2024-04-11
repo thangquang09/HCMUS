@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "vector": "cpp",
+        "new": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "system_error": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "cSpell.words": [
+        "hcmus",
+        "Quang"
+    ]
+}
