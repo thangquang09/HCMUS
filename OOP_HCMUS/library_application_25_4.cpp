@@ -19,10 +19,12 @@ public:
     string getTitle();
     BorrowerRecord* getBorrowers();
 // setter
-    void attachBorrower(BorrowerRecord* br);
     void setCatalogueNumber(string theCatalogueNumber);
     void setAuthor(string theAuthor);
     void setTitle(string theTitle);
+// function
+    void attachBorrower(BorrowerRecord* br);
+    void detachBorrower();
 // display
     void display();
     // constructor
@@ -33,9 +35,13 @@ class BorrowerRecord {
     string theName;
     vector<Book*> books;
 public:
+    // getter
     string getName();
+    // setter
     void setName(string theName);
+    // function
     void attachBook(Book* book);
+    void detachBook(string catalogueNumber);
     void display();
     // constructor
     BorrowerRecord(string theName);
@@ -64,6 +70,9 @@ void Book::setTitle(string Title) {
 void Book::attachBorrower(BorrowerRecord* br) {
     this->borrower = br;
 }
+void Book::detachBorrower() {
+    this->borrower = NULL;
+}
 void Book::display() {
     cout << "Book: " << endl;
     cout << " - Number: " << this->getCatalogueNumber() << endl;
@@ -91,7 +100,14 @@ void BorrowerRecord::setName(string theName) {
 void BorrowerRecord::attachBook(Book* book) {
     this->books.push_back(book);
 }
-
+void BorrowerRecord::detachBook(string catalogueNumber) {
+    for (auto it = this->books.begin(); it != this->books.end(); it++) {
+        if ((*it)->getCatalogueNumber() == catalogueNumber) {
+            this->books.erase(it);
+            break;
+        }
+    }
+}
 BorrowerRecord::BorrowerRecord(string theName) {
     this->setName(theName);
 }
@@ -157,6 +173,17 @@ public:
         tmp_br->attachBook(tmp_book);
         tmp_book->attachBorrower(tmp_br);
     }
+
+    void returnOneBook(string aCatalogueNumber) {
+        for (auto book : this->stock) {
+            if (book->getCatalogueNumber() == aCatalogueNumber) {
+                BorrowerRecord* tmp_borrower = book->getBorrowers();
+                tmp_borrower->detachBook(aCatalogueNumber);
+                book->detachBorrower();
+                break;
+            }
+        }
+    }
 	// display function
 	void display() {
 		cout << this->getTheName() << "'s stock:" << "\n";
@@ -193,6 +220,9 @@ int main() {
     hcmus_lib.lenOneBook("1", "Thang Quang");
     hcmus_lib.lenOneBook("2", "Tan Dao");
 
+
+    hcmus_lib.display();
+    hcmus_lib.returnOneBook("1");
     hcmus_lib.display();
     return 0;
 }

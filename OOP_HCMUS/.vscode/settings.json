@@ -5,11 +5,17 @@
         "new": "cpp",
         "*.tcc": "cpp",
         "string": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "memory": "cpp",
+        "istream": "cpp",
+        "functional": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "cSpell.words": [
         "hcmus",
         "Quang"
+    ],
+    "cSpell.enableFiletypes": [
+        "!jsonc"
     ]
 }
