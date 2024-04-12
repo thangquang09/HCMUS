@@ -58,3 +58,12 @@ WHERE
         WHERE
             ddh.MaDDH = cddh.MaDDH AND cddh.MaMH = mh.MaMH AND ddh.NgayDathang LIKE '2012-07% %'
     );
+
+-- Another ways
+
+SELECT mh.MaMH
+FROM MATHANG AS mh
+EXCEPT
+(   SELECT mh.MaMH
+    FROM MATHANG AS mh, DONDATHANG AS ddh, CHITIETDDH as ct
+    WHERE mh.MaMH = ct.MaMH AND ct.MaDDh = ddh.MaDDH AND NgayDatHang LIKE '2012-07% %'  );
