@@ -1,61 +1,58 @@
 -- Create database
-drop schema if exists Csdl_DonDatHang;
-create schema Csdl_DonDatHang;
+drop database if exists Csdl_DonDatHang;
+create database Csdl_DonDatHang;
 
 use Csdl_DonDatHang;
 
 -- Create tables
-create table NHACUNGCAP (
-    MaNCC   int,
-    TenNCC  varchar(40),
-    Email   varchar(40),
-    ThanhPho varchar(40),
-    QuocGia varchar(40),
-    constraint PK_NHACUNGCAP PRIMARY KEY (MaNCC)
+CREATE TABLE KHACHHANG (
+    MaKH    INT,
+    HoTen   VARCHAR(40),
+    DiaChi  VARCHAR(40),
+    ThanhPho VARCHAR(40),
+    QuocGia VARCHAR(40),
+    SoDT    VARCHAR(15),
+    CONSTRAINT PK_9 PRIMARY KEY (MaKH)
 );
 
-create table MATHANG (
-    MaMH      int,
-    TenMH     varchar(50),
-    MaNCC     int,
-    DonGia    decimal(12,2),
-    TinhTrang bit,
-    constraint PK_MATHANG PRIMARY KEY (MaMH)
-    
+CREATE TABLE DONDATHANG (
+    MaDDH       INT,
+    NgayDathang DATETIME,
+    MaKH        INT,
+    TriGia      DECIMAL(12,2),
+    CONSTRAINT PK_8 PRIMARY KEY (MaDDH),
+    CONSTRAINT FK_7 FOREIGN KEY (MaKH) REFERENCES KHACHHANG (MaKH)
 );
 
-create table CHITIETDDH (
-    MaCT     int,
-    MaDDH    int,
-    MaMH     int,
-    DonGia   decimal(12,2),
-    SoLuong  int,
-    constraint PK_CHITIETDDH PRIMARY KEY (MaCT, MaDDH)
+CREATE TABLE NHACUNGCAP (
+    MaNCC   INT,
+    TenNCC  VARCHAR(40),
+    Email   VARCHAR(40),
+    ThanhPho VARCHAR(40),
+    QuocGia VARCHAR(40),
+    CONSTRAINT PK_6 PRIMARY KEY (MaNCC)
 );
 
-create table DONDATHANG (
-    MaDDH       int,
-    NgayDathang datetime,
-    MaKH        int,
-    TriGia      decimal(12,2),
-    constraint PK_DONDATHANG PRIMARY KEY (MaDDH)
+CREATE TABLE MATHANG (
+    MaMH      INT,
+    TenMH     VARCHAR(50),
+    MaNCC     INT,
+    DonGia    DECIMAL(12,2),
+    TinhTrang BOOLEAN,
+    CONSTRAINT PK_5 PRIMARY KEY (MaMH),
+    CONSTRAINT FK_4 FOREIGN KEY (MaNCC) REFERENCES NHACUNGCAP (MaNCC)
 );
 
-create table KHACHHANG (
-    MaKH    int,
-    HoTen   varchar(40),
-    DiaChi  varchar(40),
-    ThanhPho varchar(40),
-    QuocGia varchar(40),
-    SoDT    varchar(15),
-    constraint PK_KHACHHANG PRIMARY KEY (MaKH)
+CREATE TABLE CHITIETDDH (
+    MaCT     INT,
+    MaDDH    INT,
+    MaMH     INT,
+    DonGia   DECIMAL(12,2),
+    SoLuong  INT,
+    CONSTRAINT PK_3 PRIMARY KEY (MaCT, MaDDH),
+    CONSTRAINT FK_2 FOREIGN KEY (MaDDH) REFERENCES DONDATHANG (MaDDH),
+    CONSTRAINT FK_1 FOREIGN KEY (MaMH) REFERENCES MATHANG (MaMH)
 );
-
--- foreign key constraints
--- alter table MATHANG add constraint FK_MaNCC foreign key (MaNCC) references NHACUNGCAP (MaNCC);
--- alter table CHITIETDDH add constraint FK_MaMH foreign key (MaMH) references MATHANG (MaMH);
--- alter table CHITIETDDH add constraint FK_MaDDH foreign key (MaDDH) references DONDATHANG (MaDDH);
--- alter table DONDATHANG add constraint FK_MaKH foreign key (MaKH) references KHACHHANG (MaKH);
 
 
 -- Insert values into tables
@@ -101,37 +98,6 @@ insert into KHACHHANG values
 (39, 'Philip Cramer', NULL, 'Brandenburg', 'Germany', '0555-09876'),
 (40, 'Daniel Tonini', NULL, 'Versailles', 'France', '30.59.84.10');
 
-insert into CHITIETDDH values 
-(1.0, 1.0, 11.0, 14.0, 12.0),
-(2.0, 1.0, 42.0, 9.8, 10.0),
-(3.0, 1.0, 72.0, 34.8, 5.0),
-(4.0, 2.0, 14.0, 18.6, 9.0),
-(5.0, 2.0, 51.0, 42.4, 40.0),
-(6.0, 3.0, 31.0, 7.7, 10.0),
-(7.0, 3.0, 51.0, 42.4, 35.0),
-(8.0, 3.0, 65.0, 16.8, 15.0),
-(9.0, 4.0, 22.0, 16.8, 6.0),
-(10.0, 4.0, 57.0, 15.6, 15.0),
-(11.0, 4.0, 65.0, 16.8, 20.0),
-(12.0, 5.0, 20.0, 64.8, 40.0),
-(13.0, 5.0, 33.0, 2.0, 25.0),
-(14.0, 5.0, 60.0, 27.2, 40.0),
-(15.0, 6.0, 31.0, 10.0, 20.0),
-(16.0, 6.0, 39.0, 14.4, 42.0),
-(17.0, 6.0, 49.0, 16.0, 40.0),
-(18.0, 7.0, 24.0, 3.6, 15.0),
-(19.0, 7.0, 55.0, 19.2, 21.0),
-(20.0, 7.0, 74.0, 8.0, 21.0),
-(21.0, 8.0, 2.0, 15.2, 20.0),
-(22.0, 8.0, 16.0, 13.9, 35.0),
-(23.0, 8.0, 36.0, 15.2, 25.0),
-(24.0, 8.0, 59.0, 44.0, 30.0),
-(25.0, 9.0, 53.0, 26.2, 15.0),
-(26.0, 9.0, 77.0, 10.4, 12.0),
-(27.0, 10.0, 27.0, 35.1, 25.0),
-(28.0, 10.0, 39.0, 14.4, 6.0),
-(29.0, 10.0, 77.0, 10.4, 15.0);
-
 insert into DONDATHANG values 
 (1, '2012-07-04 00:00:00', 15, 440.0),
 (2, '2012-07-05 00:00:00', 9, 1863.4),
@@ -143,6 +109,37 @@ insert into DONDATHANG values
 (8, '2012-07-12 00:00:00', 38, 2490.5),
 (9, '2012-07-15 00:00:00', 28, 517.8),
 (10, '2012-07-16 00:00:00', 35, 1119.9);
+
+insert into NHACUNGCAP values 
+(1, 'Exotic Liquids', NULL, 'London', 'UK'),
+(2, 'New Orleans Cajun Delights', NULL, 'New Orleans', 'USA'),
+(3, 'Grandma Kelly''s Homestead', NULL, 'Ann Arbor', 'USA'),
+(4, 'Tokyo Traders', NULL, 'Tokyo', 'Japan'),
+(5, 'Cooperativa de Quesos ''Las Cabras''', NULL, 'Oviedo', 'Spain'),
+(6, 'Mayumi''s', NULL, 'Osaka', 'Japan'),
+(7, 'Pavlova, Ltd.', NULL, 'Melbourne', 'Australia'),
+(8, 'Specialty Biscuits, Ltd.', NULL, 'Manchester', 'UK'),
+(9, 'PB Knackebrod AB', NULL, 'Goteborg', 'Sweden'),
+(10, 'Refrescos Americanas LTDA', NULL, 'Sao Paulo', 'Brazil'),
+(11, 'Heli Subwaren GmbH & Co. KG', NULL, 'Berlin', 'Germany'),
+(12, 'Plutzer Lebensmittelgrobmarkte AG', NULL, 'Frankfurt', 'Germany'),
+(13, 'Nord-Ost-Fisch Handelsgesellschaft mbH', NULL, 'Cuxhaven', 'Germany'),
+(14, 'Formaggi Fortini s.r.l.', NULL, 'Ravenna', 'Italy'),
+(15, 'Norske Meierier', NULL, 'Sandvika', 'Norway'),
+(16, 'Bigfoot Breweries', NULL, 'Bend', 'USA'),
+(17, 'Svensk Sjofoda AB', NULL, 'Stockholm', 'Sweden'),
+(18, 'Aux joyeux ecclesiastiques', NULL, 'Paris', 'France'),
+(19, 'New England Seafood Cannery', NULL, 'Boston', 'USA'),
+(20, 'Leka Trading', NULL, 'Singapore', 'Singapore'),
+(21, 'Lyngbysild', NULL, 'Lyngby', 'Denmark'),
+(22, 'Zaanse Snoepfabriek', NULL, 'Zaandam', 'Netherlands'),
+(23, 'Karkki Oy', NULL, 'Lappeenranta', 'Finland'),
+(24, 'G''day, Mate', NULL, 'Sydney', 'Australia'),
+(25, 'Ma Maison', NULL, 'Montreal', 'Canada'),
+(26, 'Pasta Buttini s.r.l.', NULL, 'Salerno', 'Italy'),
+(27, 'Escargots Nouveaux', NULL, 'Montceau', 'France'),
+(28, 'Gai paturage', NULL, 'Annecy', 'France'),
+(29, 'Forets d''erables', NULL, 'Ste-Hyacinthe', 'Canada');
 
 insert into MATHANG values 
 (1, 'Chai', 1, 18.0, 0),
@@ -224,33 +221,33 @@ insert into MATHANG values
 (77, 'Original Frankfurter grune Sobe', 12, 13.0, 0),
 (78, 'Stroopwafels', 22, 9.75, 0);
 
-insert into NHACUNGCAP values 
-(1, 'Exotic Liquids', NULL, 'London', 'UK'),
-(2, 'New Orleans Cajun Delights', NULL, 'New Orleans', 'USA'),
-(3, 'Grandma Kelly''s Homestead', NULL, 'Ann Arbor', 'USA'),
-(4, 'Tokyo Traders', NULL, 'Tokyo', 'Japan'),
-(5, 'Cooperativa de Quesos ''Las Cabras''', NULL, 'Oviedo', 'Spain'),
-(6, 'Mayumi''s', NULL, 'Osaka', 'Japan'),
-(7, 'Pavlova, Ltd.', NULL, 'Melbourne', 'Australia'),
-(8, 'Specialty Biscuits, Ltd.', NULL, 'Manchester', 'UK'),
-(9, 'PB Knackebrod AB', NULL, 'Goteborg', 'Sweden'),
-(10, 'Refrescos Americanas LTDA', NULL, 'Sao Paulo', 'Brazil'),
-(11, 'Heli Subwaren GmbH & Co. KG', NULL, 'Berlin', 'Germany'),
-(12, 'Plutzer Lebensmittelgrobmarkte AG', NULL, 'Frankfurt', 'Germany'),
-(13, 'Nord-Ost-Fisch Handelsgesellschaft mbH', NULL, 'Cuxhaven', 'Germany'),
-(14, 'Formaggi Fortini s.r.l.', NULL, 'Ravenna', 'Italy'),
-(15, 'Norske Meierier', NULL, 'Sandvika', 'Norway'),
-(16, 'Bigfoot Breweries', NULL, 'Bend', 'USA'),
-(17, 'Svensk Sjofoda AB', NULL, 'Stockholm', 'Sweden'),
-(18, 'Aux joyeux ecclesiastiques', NULL, 'Paris', 'France'),
-(19, 'New England Seafood Cannery', NULL, 'Boston', 'USA'),
-(20, 'Leka Trading', NULL, 'Singapore', 'Singapore'),
-(21, 'Lyngbysild', NULL, 'Lyngby', 'Denmark'),
-(22, 'Zaanse Snoepfabriek', NULL, 'Zaandam', 'Netherlands'),
-(23, 'Karkki Oy', NULL, 'Lappeenranta', 'Finland'),
-(24, 'G''day, Mate', NULL, 'Sydney', 'Australia'),
-(25, 'Ma Maison', NULL, 'Montreal', 'Canada'),
-(26, 'Pasta Buttini s.r.l.', NULL, 'Salerno', 'Italy'),
-(27, 'Escargots Nouveaux', NULL, 'Montceau', 'France'),
-(28, 'Gai paturage', NULL, 'Annecy', 'France'),
-(29, 'Forets d''erables', NULL, 'Ste-Hyacinthe', 'Canada');
+insert into CHITIETDDH values 
+(1.0, 1.0, 11.0, 14.0, 12.0),
+(2.0, 1.0, 42.0, 9.8, 10.0),
+(3.0, 1.0, 72.0, 34.8, 5.0),
+(4.0, 2.0, 14.0, 18.6, 9.0),
+(5.0, 2.0, 51.0, 42.4, 40.0),
+(6.0, 3.0, 31.0, 7.7, 10.0),
+(7.0, 3.0, 51.0, 42.4, 35.0),
+(8.0, 3.0, 65.0, 16.8, 15.0),
+(9.0, 4.0, 22.0, 16.8, 6.0),
+(10.0, 4.0, 57.0, 15.6, 15.0),
+(11.0, 4.0, 65.0, 16.8, 20.0),
+(12.0, 5.0, 20.0, 64.8, 40.0),
+(13.0, 5.0, 33.0, 2.0, 25.0),
+(14.0, 5.0, 60.0, 27.2, 40.0),
+(15.0, 6.0, 31.0, 10.0, 20.0),
+(16.0, 6.0, 39.0, 14.4, 42.0),
+(17.0, 6.0, 49.0, 16.0, 40.0),
+(18.0, 7.0, 24.0, 3.6, 15.0),
+(19.0, 7.0, 55.0, 19.2, 21.0),
+(20.0, 7.0, 74.0, 8.0, 21.0),
+(21.0, 8.0, 2.0, 15.2, 20.0),
+(22.0, 8.0, 16.0, 13.9, 35.0),
+(23.0, 8.0, 36.0, 15.2, 25.0),
+(24.0, 8.0, 59.0, 44.0, 30.0),
+(25.0, 9.0, 53.0, 26.2, 15.0),
+(26.0, 9.0, 77.0, 10.4, 12.0),
+(27.0, 10.0, 27.0, 35.1, 25.0),
+(28.0, 10.0, 39.0, 14.4, 6.0),
+(29.0, 10.0, 77.0, 10.4, 15.0);
