@@ -66,4 +66,5 @@ FROM MATHANG AS mh
 EXCEPT
 (   SELECT mh.MaMH
     FROM MATHANG AS mh, DONDATHANG AS ddh, CHITIETDDH as ct
-    WHERE mh.MaMH = ct.MaMH AND ct.MaDDh = ddh.MaDDH AND NgayDatHang LIKE '2012-07% %'  );
+    WHERE mh.MaMH = ct.MaMH AND ct.MaDDh = ddh.MaDDH AND NgayDatHang LIKE '2012-07% %'
+);

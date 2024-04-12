@@ -20,5 +20,26 @@ FROM NHANVIEN nv, PHONGBAN pb
 WHERE nv.MaPB = 5 AND (nv.Luong BETWEEN 25000 AND 45000) AND nv.MaPB = pb.MaPB
 ORDER BY nv.Luong DESC, nv.MaNV ASC;
 
+-- Q4: Lập danh sách các nhân viên có năm sinh từ 1955 đến 1969.
+
+SELECT *
+FROM NHANVIEN
+WHERE
+    YEAR(NgaySinh) BETWEEN 1955 AND 1969;
+
+-- Q5: Lập danh sách các nhân viên trên 60 tuổi.
+SELECT *
+FROM NHANVIEN
+WHERE
+    NgaySinh < DATE_SUB(NOW(), INTERVAL 60 YEAR);
 -- Q6: Lập danh sách mã số các nhân viên không có người thân nào. Sắp xếp kết quả theo thứ tự tăng dần của mã số.
 
+SELECT *
+FROM NHANVIEN
+WHERE
+    MaNV NOT IN (
+        SELECT MaNV
+        FROM THANNHAN
+    )
+ORDER BY
+    MaNV ASC;
