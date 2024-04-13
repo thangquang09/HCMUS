@@ -106,6 +106,7 @@ ___
 
 Cho tập $A$ gồm $n$ phần tử. Mỗi tập con gồm $k$ phần tử của $A$ được gọi là một `tổ hợp chập k của n` phần tử.
 Ký hiệu: $C^k_{n} = \left(\begin{matrix} n \\ k \end{matrix}\right)$
+
 Công thức:
 
 $$C^k_{n} = \frac{A^k_{n}}{k!} = \frac{n!}{k!(n-k)!}$$
