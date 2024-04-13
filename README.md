@@ -8,5 +8,6 @@ Chú thích:
 - OOP_HCMUS: MTH10407 - Lập trình hướng đối tượng	
 - SQL_HCMUS: MTH10312 - Cơ sở dữ liệu
 - R_programming_HCMUS: MTH10404 - Lý thuyết thống kê
+- ToanRoiRac: MTH10442 - Toán rời rạc 2A
 
-Thank for watching!
+Thank you for watching!
