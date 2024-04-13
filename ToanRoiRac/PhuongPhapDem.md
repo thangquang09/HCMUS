@@ -107,10 +107,15 @@ ___
 Cho tập $A$ gồm $n$ phần tử. Mỗi tập con gồm $k$ phần tử của $A$ được gọi là một `tổ hợp chập k của n` phần tử.
 Ký hiệu: $C^k_{n} = \left(\begin{matrix} n \\ k \end{matrix}\right)$
 Công thức:
+
 $$C^k_{n} = \frac{A^k_{n}}{k!} = \frac{n!}{k!(n-k)!}$$
+
 Một số tính chất
+
 $$C^{n-k}_{n} = C^k_{n}$$
+
 $$C^k_{n} + C^{k-1}_{n} = C^{k}_{n+1}$$
+
 **Ví dụ:** Mỗi đề thi gồm có 5 câu hỏi khác nhau chọn từ ngân hàng 50 câu hỏi đã
 cho. Hỏi có thể thành lập được bao nhiêu đề thi khác nhau?
 
@@ -208,16 +213,18 @@ các quả được chọn không quan trọng, chỉ quan trọng loại quả 
 có ít nhất bốn quả mỗi loại trong đĩa?
 
 Cách để chọn ra 4 quả từ mỗi đĩa là số tổ hợp lặp chập 4 từ tập 3 phần tử Táo, Cam, Lê
+
 $$K^r_{n}=C^{n-1}_{n+r-1} = C^{3-1}_{3+4-1}=15$$
 
 **Ví dụ:** Có bao nhiêu cách chọn 10 phần quà từ một cửa hàng có 21 phần quà
 khác nhau?
 
 Số cách chọn 10 phần quả là số tổ hợp lặp chập 10 của 21:
+
 $$C^{n-1}_{n+r-1}=C^{20}_{20+10-1}=30045015$$
 
 **Ví dụ:** Phương trình dưới đây có bao nhiêu lời giải: $x_1 + x_2 + x_3 = 11$ trong đó
-$x_1 , x_2 , x_3$là các số nguyên không âm?
+$x_1 , x_2 , x_3$ là các số nguyên không âm?
 
 Một nghiệm của phương trình là tương ứng với một cách lấy ra 11 phần tử
 từ một tập có 3 loại phần tử sao cho có
