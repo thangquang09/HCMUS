@@ -29,7 +29,9 @@ Cho $A$ và $B$ là hai tập hữu hạn. Khi đó
 $$|A \cup B|=|A| + |B| - |A \cap B|$$
 Vậy từ đó ta có
 $$|A \cup B \cup C| = |A| + |B| + |C| - |A \cap B| - |A \cap C| - |B \cap C| + |A \cap B \cap C|$$
+
 ![image](image.png)
+
 **Ví dụ 1:** Trong một lớp ngoại ngữ Anh Pháp, có 24 sinh viên học tiếng Pháp; 26
 sinh viên học tiếng Anh; 15 sinh viên học tiếng Anh và tiếng Pháp. Hỏi lớp có bao
 nhiêu sinh viên?
