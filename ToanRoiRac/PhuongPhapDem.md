@@ -113,9 +113,9 @@ $$C^k_{n} = \frac{A^k_{n}}{k!} = \frac{n!}{k!(n-k)!}$$
 
 Một số tính chất
 
-$$C^{n-k}_{n} = C^k_{n}$$
+$$C_n^{n-k} = C_n^k$$
 
-$$C^k_{n} + C^{k-1}_{n} = C^{k}_{n+1}$$
+$$C_{n}^k + C_{n}^{k-1} = C_{n+1}^{k}$$
 
 **Ví dụ:** Mỗi đề thi gồm có 5 câu hỏi khác nhau chọn từ ngân hàng 50 câu hỏi đã
 cho. Hỏi có thể thành lập được bao nhiêu đề thi khác nhau?
