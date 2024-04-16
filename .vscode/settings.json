@@ -1,9 +1,11 @@
 {
     "cSpell.words": [
         "Congty",
-        "Csdl"
+        "Csdl",
+        "RMSE"
     ],
     "cSpell.enableFiletypes": [
         "!sql"
-    ]
+    ],
+    "r.lsp.promptToInstall": false
 }
