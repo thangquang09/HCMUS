@@ -1,3 +1,23 @@
+**TABLE OF CONTENTS**
+- [1. Nguyên lý cộng](#1-nguyên-lý-cộng)
+- [2. Nguyên lý nhân](#2-nguyên-lý-nhân)
+- [3. Nguyên lý bù trù](#3-nguyên-lý-bù-trù)
+- [4. Nguyên lý Dirichle (Chuồng bồ câu)](#4-nguyên-lý-dirichle-chuồng-bồ-câu)
+  - [Định nghĩa:](#định-nghĩa)
+- [5. Hoán vị](#5-hoán-vị)
+- [6. Chỉnh hợp](#6-chỉnh-hợp)
+- [7. Tổ hợp](#7-tổ-hợp)
+- [8. Giải tích tổ hợp](#8-giải-tích-tổ-hợp)
+- [9. Hoán vị lặp](#9-hoán-vị-lặp)
+  - [Định nghĩa](#định-nghĩa-1)
+  - [Ví dụ](#ví-dụ)
+- [10. Chỉnh hợp lặp](#10-chỉnh-hợp-lặp)
+  - [11. Tổ hợp lặp](#11-tổ-hợp-lặp)
+  - [Định nghĩa](#định-nghĩa-2)
+  - [Hệ quả:](#hệ-quả)
+  - [Ví dụ:](#ví-dụ-1)
+
+
 ## 1. Nguyên lý cộng
 
 Giả sử công việc A có 2 phương pháp làm
