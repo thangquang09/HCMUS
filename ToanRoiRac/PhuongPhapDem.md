@@ -233,5 +233,6 @@ từ một tập có 3 loại phần tử sao cho có
 - $x_{2}$ phần tử loại 2
 - $x_{3}$ phần tử loại 3
 Do đó, số nghiệm phương trình bằng số tổ hợp chặp 11 của một tập có 3 phần tử
-$$C^{n-1}_{n+r-1} = C^2_{13}= 78$$
+
+$$C_{n+r-1}^{n-1} = C_{13}^2= 78$$
 
