@@ -1,3 +1,4 @@
+-- DBMS: MySQL
 use Csdl_Congty;
 
 -- Q1: Với mỗi phòng ban, cho biết tên phòng, tổng số nhân viên, mức lương cao nhất, mức lương thấp nhất.
@@ -12,20 +13,20 @@ GROUP BY
 -- Q2: - Lập danh sách mã số, tên dự án và tổng số nhân viên đang làm việc cho các dự án được triển khai ở
 -- Phú Nhuận.
 
-SELECT da.MaDA, da.TenDA, count(nv.MaNV) AS TongSoNhanVien
+SELECT da.MaDA, da.TenDA, count(tg.MaNV) AS TongSoNhanVien
 FROM
-    NHANVIEN nv JOIN THAMGIA tg ON nv.MaNV = tg.MaNV JOIN DUAN da ON da.MaDA = tg.MaDA AND da.DiaDiem = "Phu Nhuan"
+    THAMGIA tg JOIN DUAN da ON da.MaDA = tg.MaDA AND da.DiaDiem = "Phu Nhuan"
 GROUP BY
-    da.MaDA;
+    da.MaDA, da.TenDA;
 
 -- Q3: - Yêu cầu tương tự Q2 nhưng thêm điều kiện để
 -- lọc ra các dự án có nhiều hơn 2 nhân viên.
 
-SELECT da.MaDA, da.TenDA, count(nv.MaNV) AS TongSoNhanVien
+SELECT da.MaDA, da.TenDA, count(tg.MaNV) AS TongSoNhanVien
 FROM
-    NHANVIEN nv JOIN THAMGIA tg ON nv.MaNV = tg.MaNV JOIN DUAN da ON da.MaDA = tg.MaDA AND da.DiaDiem = "Phu Nhuan"
+    THAMGIA tg JOIN DUAN da ON da.MaDA = tg.MaDA AND da.DiaDiem = "Phu Nhuan"
 GROUP BY
-    da.MaDA
+    da.MaDA, da.TenDa
 HAVING TongSoNhanVien > 2;
 
 -- Q4: - Lập danh sách các nhân viên có mức lương cao nhất.
@@ -42,8 +43,6 @@ WHERE
 
 -- Q5: Lập danh sách các phòng ban mà các nhân viên có mức lương không thấp hơn 30,000.
 
-SELECT  DISTINCT(pb.MaPB), pb.TenPB
-FROM
-    PHONGBAN pb, NHANVIEN nv
-WHERE
-    pb.MaPB = nv.MaPB AND nv.Luong >= 30000;
+SELECT *
+FROM PHONGBAN pb
+WHERE not exists (SELECT * FROM NHANVIEN n WHERE n.MaPB = pb.MaPB AND Luong < 30000);
