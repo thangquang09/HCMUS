@@ -42,14 +42,8 @@ WHERE
 
 -- Q5: Lập danh sách các phòng ban mà các nhân viên có mức lương không thấp hơn 30,000.
 
-SELECT MaNV, HoNV, Dem, TenNV, Luong
+SELECT  DISTINCT(pb.MaPB), pb.TenPB
 FROM
-    NHANVIEN
+    PHONGBAN pb, NHANVIEN nv
 WHERE
-    Luong IN (
-        SELECT Luong
-        FROM
-            NHANVIEN
-        WHERE
-            Luong >= 30000
-    );
+    pb.MaPB = nv.MaPB AND nv.Luong >= 30000;
