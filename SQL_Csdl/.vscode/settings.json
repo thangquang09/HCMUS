@@ -1,6 +1,7 @@
 {
     "r.lsp.promptToInstall": false,
     "cSpell.enableFiletypes": [
+        "!markdown",
         "!sql"
     ]
 }
