@@ -120,8 +120,8 @@ class Library {
 private:
 	// atts
 	string theName;
-	vector<Book *> stock;
-	vector<BorrowerRecord *> Borrowers;
+	vector<Book*> stock;
+	vector<BorrowerRecord*> Borrowers;
 public:
 	// getter and setter
 	string getTheName() {
