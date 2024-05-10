@@ -1,0 +1,27 @@
+Xây dựng một chương trình C++ để quản lý thông tin của các tài khoản ngân hàng và các chủ tài khoản.
+
+Thông tin của tài khoản (Account) gồm có:
+
+id: số tài khoản
+
+balance: số dư của tài khoản
+
+Thông tin của chủ tài khoản (AccountOwner) gồm có:
+
+name: tên của chủ tài khoản
+
+Một chủ tài khoản có thể có nhiều tài khoản khác nhau. Và một tài khoản có thể có nhiều chủ tài khoản.
+
+Chương trình chính sẽ thực hiện các thao tác sau:
+
+Tạo 3 tài khoản.
+
+Tạo 2 chủ tài khoản.
+
+Liên kết 2 tài khoản đầu với chủ tài khoản đầu tiên.
+
+Liên kết tài khoản thứ 3 với chủ tài khoản 1 và 2.
+
+Hiển thị thông tin của các tài khoản và các chủ tài khoản đang sở hữu tài khoản đó.
+
+Hiển thị thông tin của các chủ tài khoản và danh sách các tài khoản mà chủ tài khoản đó đang sở hữu.

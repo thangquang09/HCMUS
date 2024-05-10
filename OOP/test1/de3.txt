@@ -1,0 +1,27 @@
+Xây dựng một chương trình C++ để quản lý thông tin của các sinh viên đã ghi danh học trong các khoa của một trường đại học.
+
+Thông tin của một sinh viên (Student) gồm có:
+
+id: mã số sinh viên
+
+name: tên sinh viên
+
+Thông tin của một ngành học (Major) gồm có:
+
+name: tên ngành học
+
+Một sinh viên có thể đăng kí học ở nhiều ngành đào tạo khác nhau. Ví dụ, một sinh viên có thể học ngành Khoa học Máy tính và Toán-Tin.
+
+Chương trình chính sẽ thực hiện các thao tác sau:
+
+Tạo 3 sinh viên.
+
+Tạo 2 ngành học.
+
+Cho 2 sinh viên đầu tiên đăng kí học 2 ngành học.
+
+Cho sinh viên thứ 3 đăng kí học ngành học thứ 2.
+
+Hiển thị thông tin của các sinh viên bao gồm thông tin cá nhân và các ngành mà sinh viên đó đang học.
+
+Hiển thị thông tin của các ngành học và danh sách các sinh viên đang học ngành học đó.
