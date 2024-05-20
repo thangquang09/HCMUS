@@ -36,6 +36,7 @@ public:
 };
 
 class Programmer : Employee {
+private:
     string language;
 public:
     string getLanguage() {
@@ -44,9 +45,12 @@ public:
     void getLanguage(string language) {
         this->language = language;
     }
+    void setLanguage(string language) {
+        this->language = language;
+    }
     // constructor
     Programmer(string number, double salary, string name, string language) : Employee(number, salary, name) {
-        this->language = language;
+        this->setLanguage(language);
     }
     // display
     void display() {
