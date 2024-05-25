@@ -82,15 +82,16 @@ ci.prob = function(f, n, alpha) {
 }
 
 
-ci.prob(sum(data >= 5), length(data), 0.1)
-ci.prob(sum(data >= 5), length(data), 0.05)
-ci.prob(sum(data >= 5), length(data), 0.01)
+ci.prob(sum(data > 5), length(data), 0.1)
+ci.prob(sum(data > 5), length(data), 0.05)
+ci.prob(sum(data > 5), length(data), 0.01)
 
 
 # 4.
+# a.
 data = c(replicate(6, 1.3), replicate(34, 1.5), replicate(31, 1.7), replicate(42, 1.9), replicate(12, 2.1))
 ci.mean(data, 0.05)
-
+# b.
 gt1m7 = sum(data >= 1.7)
 ci.prob(gt1m7, length(data), 0.05)
 
@@ -129,4 +130,4 @@ ktc.tb.mau = function(x, dolechchuan = -1, n, alpha) {
 X = c(replicate(2, 12), replicate(3, 12.05), replicate(7, 12.1), replicate(9, 12.15), replicate(10, 12.2), 
       replicate(8, 12.25), replicate(6, 12.3), replicate(5, 12.35), replicate(3, 12.4))
 
-ktc.tb.mau(x= X, n = length(X), alpha = 0.05)
+ktc.tb.mau(x = X, n = length(X), alpha = 0.05)
