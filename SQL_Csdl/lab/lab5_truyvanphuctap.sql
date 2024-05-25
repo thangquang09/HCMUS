@@ -84,6 +84,11 @@ Thực hiện các yêu cầu truy xuất dữ liệu sau với cơ sở dữ li
 use Csdl_DonDatHang;
 
 -- 1.
+SELECT ncc.MaNCC, ncc.TenNCC, COUNT(mh.MaNCC) AS SoMatHang
+FROM NHACUNGCAP NCC JOIN MATHANG ON ncc.MaNCC = mh.MaNCC
+GROUP BY ncc.MaNCC, ncc.TenNCC
+HAVING
+    SoMatHang = (SELECT MaMH FROM MATHANG ORDER BY MaMH DESC LIMIT 1);
 
 -- 2.
 SELECT mh.MaMH, mh.TenMH, ctddh.DonGia, ddh.MaKH
