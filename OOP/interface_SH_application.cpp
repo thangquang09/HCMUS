@@ -59,11 +59,11 @@ public:
 };
 
 class ProjectLeader : public Programmer {
-    vector<Programmer*> team;
+    map<string, Programmer*> team;
 public:
     // constructor
     ProjectLeader(string number, double salary, string name, string language) : Programmer(number, salary, name, language) {
-        this->team = {};
+
     }
     void display() {
         // call display of Programmer
@@ -71,11 +71,11 @@ public:
         Programmer::display();
         cout << "\t---Team:---\n";
         for (auto programmer : team) {
-            programmer->display();
+            programmer.second->display();
         }
     }
     void addProgrammer(Programmer* pr) {
-        team.push_back(pr);
+        this->team[pr->getNumber()] = pr;
     }
 };
 
@@ -132,7 +132,6 @@ class SoftwareHouse {
                 cout << "\n";
             }
         }
-
 };
 
 int main() {
