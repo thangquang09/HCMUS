@@ -8,7 +8,8 @@
         "system_error": "cpp",
         "memory": "cpp",
         "istream": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "ostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "cSpell.words": [
