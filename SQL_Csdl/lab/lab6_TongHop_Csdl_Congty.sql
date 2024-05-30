@@ -193,3 +193,113 @@ WHERE
 
 -- 5. Cho biết các chuyến bay xuất phát từ Sài Gòn (SGN) đi Ban Mê Thuộc (BMV). 
 
+SELECT *
+FROM
+    CHUYENBAY
+WHERE
+    GaDi = "SGN" AND GaDen = "BMV";
+
+-- PHAN 2
+-- 18. Với mỗi ga có chuyến bay xuất phát từ đó cho biết có bao nhiêu chuyến bay khởi hành từ ga đó. 
+
+SELECT GaDi, COUNT(*) AS "SoChuyenBay"
+FROM
+    CHUYENBAY
+GROUP BY
+    GaDi;
+
+-- 19. Với mỗi ga có chuyến bay xuất phát từ đó cho biết tổng chi phí phải trả cho phi công lái các 
+-- chuyến bay khởi hành từ ga đó. 
+
+SELECT GaDi, SUM(ChiPhi) AS "TongChiPhi"
+FROM
+    CHUYENBAY
+GROUP BY
+    GaDi;
+
+-- 20. Với mỗi địa điểm xuất phát cho biết có bao nhiêu chuyến bay có thể khởi hành trước 12:00. 
+
+SELECT GaDi, COUNT(*) AS "SoChuyenTruoc12Gio"
+FROM
+    CHUYENBAY
+WHERE
+    GioDi <= "12:00:00"
+GROUP BY
+    GaDi;
+
+-- 21. Cho biết mã số của các phi công chỉ lái được 3 loại máy bay
+
+SELECT MaNV AS "MaNV lai duoc dung 3 mb"
+FROM
+    CHUNGNHAN
+GROUP BY
+    MaNV
+HAVING
+    COUNT(MaMB) = 3;
+
+-- 22. Với mỗi phi công có thể lái nhiều hơn 3 loại máy bay, cho biết mã số phi công và tầm bay lớn
+-- nhất của các loại máy bay mà phi công đó có thể lái.
+
+SELECT c.MaNV AS "MaNV lai duoc hon 3 mb", MAX(m.TamBay)
+FROM
+    CHUNGNHAN c JOIN MAYBAY m ON c.MaMB = m.MaMB
+GROUP BY
+    MaNV
+HAVING
+    COUNT(c.MaMB) > 3;
+
+-- PHAN 3:
+-- 26. Tìm các nhân viên không phải là phi công
+
+SELECT MaNV AS "MaNV ko phai phi cong"
+FROM
+    NHANVIEN
+WHERE
+    MaNV NOT IN (
+        SELECT DISTINCT(MaNV) FROM CHUNGNHAN
+    );
+
+-- 27. Cho biết mã số của các nhân viên có lương cao nhất. 
+
+SELECT MaNV
+FROM
+    NHANVIEN
+WHERE
+    Luong = (SELECT MAX(Luong) FROM NHANVIEN);
+
+-- 28. Cho biết tổng số lương phải trả cho các phi công. 
+
+SELECT SUM(Luong) AS "TongLuongTraPhiCong"
+FROM
+    NHANVIEN
+WHERE
+    MaNV IN (
+        SELECT MaNV
+        FROM
+            CHUNGNHAN
+    );
+
+-- 29. Tìm các chuyến bay có thể được thực hiện bởi tất cả các loại máy bay Boeing. 
+
+SELECT * FROM CHUYENBAY; -- đề sai
+
+-- 30. Cho biết mã số của các máy bay có thể được sử dụng để thực hiện chuyến bay từ Sài Gòn (SGN) 
+-- đến Huế (HUI). 
+
+-- đề sai
+
+-- 31. Tìm các chuyến bay có thể được lái bởi các phi công có lương lớn hơn 100,000. 
+
+-- 34.  Cho biết mã số của các nhân viên có lương cao thứ nhì. 
+
+
+(SELECT MaNV FROM NHANVIEN ORDER BY Luong DESC LIMIT 2)
+
+(SELECT MaNV FROM NHANVIEN
+WHERE
+    Luong = (SELECT MAX(Luong) FROM NHANVIEN));
+
+
+
+
+-- cau 1

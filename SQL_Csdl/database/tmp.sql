@@ -1,139 +1,161 @@
-DROP DATABASE IF EXISTS CsdlHangkhong;
-CREATE DATABASE CsdlHangkhong;
-USE CsdlHangkhong;
+create schema Csdl_Congty;
 
-CREATE TABLE CHUYENBAY (
-    MaCB CHAR(5),
-    GaDi VARCHAR(50),
-    GaDen VARCHAR(50),
-    DoDai INT,
-    GioDi TIME,
-    GioDen TIME,
-    ChiPhi INT,
-    PRIMARY KEY (MaCB)
+-- Change the working database to Csdl_Congty
+use Csdl_Congty;
+
+-- Create table PHONGBAN
+create table PHONGBAN (
+	MaPB			int				not null,
+	TenPB			varchar(15) 	not null,
+	MaQL			char(9)			not null default '888665555',
+	NgayBoNhiem		date,
+	constraint PK_PHONGBAN primary key (MaPB),
+	constraint AK_PHONGBAN_TenPB unique (TenPB)
 );
 
-CREATE TABLE MAYBAY (
-    MaMB INT,
-    Loai VARCHAR(50),
-    TamBay INT,
-    PRIMARY KEY (MaMB)
+-- Create table NHANVIEN
+create table NHANVIEN (
+	MaNV			char(9)			not null,
+	HoNV			varchar(15) 	not null,
+	Dem				varchar(15),
+	TenNV			varchar(15) 	not null,
+	NgaySinh		date,
+	DiaChi			varchar(50),
+	GioiTinh		char			check (GioiTinh in ('F', 'f', 'M', 'm')),
+	Luong			int,
+	MaGS			char(9),
+	MaPB			int				not null default 1,
+	constraint PK_NHANVIEN primary key (MaNV),
+	constraint FK_NHANVIEN_MaGS foreign key (MaGS) 
+								references NHANVIEN (MaNV)
+								on delete set null,
+	constraint FK_NHANVIEN_PHONGBAN foreign key (MaPB) 
+									references PHONGBAN (MaPB)
+									on delete set default on update cascade
 );
 
-CREATE TABLE NHANVIEN (
-    MaNV CHAR(9),
-    Ten VARCHAR(50),
-    Luong INT,
-    PRIMARY KEY (MaNV)
+-- Add a referential constraint for PHONGBAN
+alter table PHONGBAN add constraint FK_PHONGBAN_NHANVIEN foreign key (MaQL) 
+														 references NHANVIEN (MaNV)
+														 on delete set default on update cascade;
+
+-- Create table TRUSO_PHONG
+create table TRUSO_PHONG (
+	MaPB			int				not null,
+	TruSo			varchar(50) 	not null,
+	constraint PK_TRUSO primary key (MaPB, TruSo),
+	constraint FK_TRUSO_PHONGBAN foreign key (MaPB) 
+								 references PHONGBAN (MaPB)
+								 on delete cascade on update cascade
 );
 
-CREATE TABLE CHUNGNHAN (
-    MaNV CHAR(9),
-    MaMB INT,
-    PRIMARY KEY (MaNV, MaMB),
-    FOREIGN KEY (MaNV) REFERENCES NHANVIEN (MaNV),
-    FOREIGN KEY (MaMB) REFERENCES MAYBAY (MaMB)
+-- Create table DUAN
+create table DUAN (
+	MaDA			int				not null,
+	TenDA			varchar(30) 	not null,
+	DiaDiem			varchar(50),
+	MaPB			int				not null,
+	constraint PK_DUAN primary key (MaDA),
+	constraint AK_DUAN_TenDA unique (TenDA),
+	constraint FK_DUAN_PHONGBAN foreign key (MaPB) 
+								references PHONGBAN (MaPB)
+								on delete cascade on update cascade
 );
 
-insert into CHUYENBAY values ('VN431','SGN','CAH',3693,'05:55:00','06:55:00',236);
-insert into CHUYENBAY values ('VN320','SGN','DAD',2798,'06:00:00','07:10:00',221);
-insert into CHUYENBAY values ('VN464','SGN','DLI',2002,'07:20:00','08:05:00',225);
-insert into CHUYENBAY values ('VN216','SGN','DIN',4170,'10:30:00','14:20:00',262);
-insert into CHUYENBAY values ('VN280','SGN','HPH',11979,'06:00:00','08:00:00',1279);
-insert into CHUYENBAY values ('VN254','SGN','HUI',8765,'18:40:00','20:00:00',781);
-insert into CHUYENBAY values ('VN338','SGN','BMV',4081,'15:25:00','16:25:00',375);
-insert into CHUYENBAY values ('VN440','SGN','BMV',4081,'18:30:00','19:30:00',426);
-insert into CHUYENBAY values ('VN651','DAD','SGN',2798,'19:30:00','08:00:00',221);
-insert into CHUYENBAY values ('VN276','DAD','CXR',1283,'09:00:00','12:00:00',203);
-insert into CHUYENBAY values ('VN374','HAN','VII',510,'11:40:00','13:25:00',120);
-insert into CHUYENBAY values ('VN375','VII','CXR',752,'14:15:00','16:00:00',181);
-insert into CHUYENBAY values ('VN269','HAN','CXR',1262,'14:10:00','15:50:00',202);
-insert into CHUYENBAY values ('VN315','HAN','DAD',134,'11:45:00','13:00:00',112);
-insert into CHUYENBAY values ('VN317','HAN','UIH',827,'15:00:00','16:15:00',190);
-insert into CHUYENBAY values ('VN741','HAN','PXU',395,'06:30:00','08:30:00',120);
-insert into CHUYENBAY values ('VN474','PXU','PQC',1586,'08:40:00','11:20:00',102);
-insert into CHUYENBAY values ('VN476','UIH','PQC',485,'09:15:00','11:50:00',117);
+-- Create table THAMGIA
+create table THAMGIA (
+	MaNV			char(9)			not null,
+	MaDA			int				not null,
+	SoGio			decimal(6,1),
+	constraint PK_THAMGIA primary key (MaNV, MaDA),
+	constraint FK_THAMGIA_NHANVIEN foreign key (MaNV) 
+								   references NHANVIEN (MaNV)
+								   on delete cascade on update cascade,
+	constraint FK_THAMGIA_DUAN foreign key (MaDA) 
+							   references DUAN (MaDA)
+							   on delete cascade on update cascade
+);
 
--- chen du lieu MAYBAY
-insert into MAYBAY values (747,'Boeing 747 - 400',13488);
-insert into MAYBAY values (737,'Boeing 737 - 800',5413);
-insert into MAYBAY values (380,'Airbus A380 - 500',15000);
-insert into MAYBAY values (340,'Airbus A340 - 300',11392);
-insert into MAYBAY values (757,'Boeing 757 - 300',6416);
-insert into MAYBAY values (777,'Boeing 777 - 300',10306);
-insert into MAYBAY values (767,'Boeing 767 - 400ER',10360);
-insert into MAYBAY values (320,'Airbus A320',4168);
-insert into MAYBAY values (319,'Airbus A319',2888);
-insert into MAYBAY values (727,'Boeing 727',2406);
-insert into MAYBAY values (154,'Tupolev 154',6565);
+-- Create table THANNHAN
+create table THANNHAN (
+	MaNV			char(9)			not null,
+	TenTN			varchar(45)		not null,
+	GioiTinh		char			check (GioiTinh in ('M', 'm', 'F', 'f')),
+	NgaySinh		date,
+	QuanHe			varchar(10),
+	constraint PK_THANNHAN primary key (MaNV, TenTN),
+	constraint FK_THANNHAN_NHANVIEN foreign key (MaNV) 
+									references NHANVIEN (MaNV)
+									on delete cascade on update cascade
+);
 
--- chen du lieu NHANVIEN
-insert into NHANVIEN values ('242518965','Tran Van Son',120433);
-insert into NHANVIEN values ('141582651','Doan Thi Mai',178345);
-insert into NHANVIEN values ('011564812','Ton Van Quy',153972);
-insert into NHANVIEN values ('567354612','Quan Cam Ly',256481);
-insert into NHANVIEN values ('552455318','La Que',101745);
-insert into NHANVIEN values ('550156548','Nguyen Thi Cam',205187);
-insert into NHANVIEN values ('390487451','Le Van Luat',212156);
-insert into NHANVIEN values ('274878974','Mai Quoc Minh',99890);
-insert into NHANVIEN values ('254099823','Nguyen Thi Quynh',24450);
-insert into NHANVIEN values ('356187925','Nguyen Vinh Bao',44740);
-insert into NHANVIEN values ('355548984','Tran Thi Hoai An',212156);
-insert into NHANVIEN values ('310454876','Ta Van Do',212156);
-insert into NHANVIEN values ('489456522','Nguyen Thi Quy Linh',127984);
-insert into NHANVIEN values ('489221823','Bui Quoc Chinh',23980);
-insert into NHANVIEN values ('548977562','Le Van Quy',84476);
-insert into NHANVIEN values ('310454877','Tran Van Hao',33546);
-insert into NHANVIEN values ('142519864','Nguyen Thi Xuan Dao',227489);
-insert into NHANVIEN values ('269734834','Truong Tuan Anh',289950);
-insert into NHANVIEN values ('287321212','Duong Van Minh',48090);
-insert into NHANVIEN values ('552455348','Bui Thi Dung',92013);
-insert into NHANVIEN values ('248965255','Tran Thi Ba',43723);
-insert into NHANVIEN values ('159542516','Le Van Ky',48250);
-insert into NHANVIEN values ('348121549','Nguyen Van Thanh',32899);
-insert into NHANVIEN values ('574489457','Bui Van Lap',20);
+-- Off checking referential constraint FK_PHONGBAN_NHANVIEN, FK_NHANVIEN_MaGS
+set foreign_key_checks = 0;
 
--- chen du lieu CHUNGNHAN
-insert into CHUNGNHAN values ('567354612',747);
-insert into CHUNGNHAN values ('567354612',737);
-insert into CHUNGNHAN values ('567354612',757);
-insert into CHUNGNHAN values ('567354612',777);
-insert into CHUNGNHAN values ('567354612',767);
-insert into CHUNGNHAN values ('567354612',727);
-insert into CHUNGNHAN values ('567354612',340);
-insert into CHUNGNHAN values ('552455318',737);
-insert into CHUNGNHAN values ('552455318',319);
-insert into CHUNGNHAN values ('552455318',747);
-insert into CHUNGNHAN values ('552455318',767);
-insert into CHUNGNHAN values ('390487451',340);
-insert into CHUNGNHAN values ('390487451',320);
-insert into CHUNGNHAN values ('390487451',319);
-insert into CHUNGNHAN values ('274878974',757);
-insert into CHUNGNHAN values ('274878974',767);
-insert into CHUNGNHAN values ('355548984',154);
-insert into CHUNGNHAN values ('310454876',154);
-insert into CHUNGNHAN values ('142519864',747);
-insert into CHUNGNHAN values ('142519864',757);
-insert into CHUNGNHAN values ('142519864',777);
-insert into CHUNGNHAN values ('142519864',767);
-insert into CHUNGNHAN values ('142519864',737);
-insert into CHUNGNHAN values ('142519864',340);
-insert into CHUNGNHAN values ('142519864',320);
-insert into CHUNGNHAN values ('269734834',747);
-insert into CHUNGNHAN values ('269734834',737);
-insert into CHUNGNHAN values ('269734834',340);
-insert into CHUNGNHAN values ('269734834',757);
-insert into CHUNGNHAN values ('269734834',777);
-insert into CHUNGNHAN values ('269734834',767);
-insert into CHUNGNHAN values ('269734834',320);
-insert into CHUNGNHAN values ('269734834',319);
-insert into CHUNGNHAN values ('269734834',727);
-insert into CHUNGNHAN values ('269734834',154);
-insert into CHUNGNHAN values ('242518965',737);
-insert into CHUNGNHAN values ('242518965',757);
-insert into CHUNGNHAN values ('141582651',737);
-insert into CHUNGNHAN values ('141582651',757);
-insert into CHUNGNHAN values ('141582651',767);
-insert into CHUNGNHAN values ('011564812',737);
-insert into CHUNGNHAN values ('011564812',757);
-insert into CHUNGNHAN values ('574489457',154);
+-- Insert tuples into PHONGBAN
+insert into PHONGBAN 
+values (5,'Nghien cuu','333445555','1988-05-22'),
+	   (4,'Dieu hanh','987654321','1995-01-01'),
+	   (1,'Quan ly','888665555','1981-06-19');
+
+-- Insert tuples into NHANVIEN
+insert into NHANVIEN 
+values ('888665555','Le','Van','Bo','1937-11-10','450 Trung Vuong, Ha Noi','M',55000,null,1),
+	   ('333445555','Phan','Van','Nghia','1955-12-08','638 Nguyen Van Cu, Q5, TpHCM','M',40000,'888665555',5),
+	   ('123456789','Nguyen','Bao','Hung','1965-01-09','731 Tran Hung Dao, Q1, TpHCM','M',30000,'333445555',5),
+	   ('666884444','Tran',null,'Nam','1962-09-15','975 Ba Ria Vung Tau','M',38000,'333445555',5),
+	   ('453453453','Hoang','Kim','Yen','1972-07-31','543 Mai Thi Luu, Q1, TpHCM','F',25000,'333445555',5),
+	   ('987654321','Du','Thi','Hau','1951-06-20','291 Ho Van Hue, QPN, TpHCM','F',43000,'888665555',4),
+	   ('999887777','Au',null,'Vuong','1968-07-19','332 Nguyen Thai Hoc, Q1, TpHCM','F',25000,'987654321',4),
+	   ('987987987','Nguyen','Van','Giap','1969-03-09','980 Le Hong Phong, Q10, TpHCM','M',25000,'987654321',4);
+
+-- On checking referential constraint FK_PHONGBAN_NHANVIEN, FK_NHANVIEN_MaGS
+set foreign_key_checks = 1;
+	  
+-- Insert tuples into TRUSO_PHONG
+insert into TRUSO_PHONG 
+values (1,'Phu Nhuan'),
+	   (4,'Go Vap'),
+	   (5,'Tan Binh'),
+	   (5,'Phu Nhuan'),
+	   (5,'Thu Duc');
+
+-- Insert tuple into DUAN
+insert into DUAN 
+values (1,'San pham X','Tan Binh',5),
+	   (2,'San pham Y','Thu Duc',5),
+	   (3,'San pham Z','Phu Nhuan',5),
+	   (10,'Tin hoc hoa','Go Vap',4),
+	   (20,'Tai to chuc','Phu Nhuan',1),
+	   (30,'Phuc loi','Go Vap',4);
+
+-- Insert tuples into THAMGIA
+insert into THAMGIA 
+values ('123456789',1,32.5),
+	   ('123456789',2,7.5),
+	   ('666884444',3,40),
+	   ('453453453',1,20),
+	   ('453453453',2,20),
+	   ('333445555',2,10),
+	   ('333445555',3,10),
+	   ('333445555',10,10),
+	   ('333445555',20,10),
+	   ('999887777',30,30),
+	   ('999887777',10,10),
+	   ('987987987',10,35),
+	   ('987987987',30,5),
+	   ('987654321',30,20),
+	   ('987654321',20,15),
+	   ('888665555',20,null),
+	   ('333445555', 1, 5),
+	   ('333445555', 30, 5);
+
+-- Insert tuples into THANNHAN
+insert into THANNHAN 
+values ('333445555','Anh','F','1986-04-05','Con gai'),
+	   ('333445555','The','M','1983-10-25','Con trai'),
+	   ('333445555','Loi','F','1958-05-03','Vo'),
+	   ('987654321','An','M','1942-02-28','Chong'),
+	   ('123456789','Minh','M','1988-01-01','Con trai'),
+	   ('123456789','Anh','F','1988-12-30','Con gai'),
+	   ('123456789','Yen','F','1967-05-05','Vo');
