@@ -218,7 +218,7 @@ public:
         this->dayOfWeek = dayOfWeek;
     }
     string getTimeOfDay() {
-        return timeOfDay;
+        return this->timeOfDay;
     }
     void setTimeOfDay(string timeOfDay) {
         this->timeOfDay = timeOfDay;
@@ -342,7 +342,6 @@ void Transcript::addTranscriptEntry(TranscriptEntry* entry) {
     if (grade >= 5) {
         this->getStudent()->getPlanOfStudy()->addCompletedCourse(course);
     }
-
     entry->setTranscript(this);
 }
 
@@ -352,7 +351,6 @@ void Section::addProfessor(Professor *professor) {
 
 void Section::addTranscriptEntry(TranscriptEntry* grade) {
     grades[grade->getTranscript()->getStudent()->getSSN()] = grade;
-    grade->setSection(this);
 }
 
 void Section::removeStudent(Student* student) {
@@ -497,33 +495,39 @@ int main() {
     pos1.addCourse(&c2);
     pos1.addCourse(&c3);
 
+
+    PlanOfStudy pos2 = PlanOfStudy();
+    pos2.addCourse(&c1);
+    pos2.addCourse(&c2);
+    pos2.addCourse(&c3);
+
     // add plan of study to student 1
     s1.addPlanOfStudy(&pos1);
+    s2.addPlanOfStudy(&pos2);
     // create transcript
     Transcript t1 = Transcript();
     s1.addTranscript(&t1);
+    Transcript t2 = Transcript();
+    s2.addTranscript(&t2);
     // student 1 add section 1
-    cout << "Adding section 1...\n";
     s1.addSection(&sec1);
+    s2.addSection(&sec2);
     // sec 1 has been completed and student 1 has grade 5 (enough to pass)
     TranscriptEntry te1 = TranscriptEntry("5");
+    TranscriptEntry te2 = TranscriptEntry("6");
+    TranscriptEntry te3 = TranscriptEntry("8");
+
     te1.setSection(&sec1);
     t1.addTranscriptEntry(&te1);
+    sec1.addTranscriptEntry(&te1);
 
-    // student 1 try to add section 2 which have course prerequisite is course 1
-    cout << "Adding section 2...\n";
-    s1.addSection(&sec2);
+    te2.setSection(&sec1);
+    t2.addTranscriptEntry(&te2);
+    sec1.addTranscriptEntry(&te2);
 
-    // student 1 try to add section 3 when he has not completed  course 2
-    cout << "Adding section 3 when he has not completed course 2...\n";
-    s1.addSection(&sec3);
-
-    // student 1 try to add section 4 when course 4 is not in his plan
-    cout << "Adding section 4 when course 4 is not in his plan...\n";
-    s1.addSection(&sec4);
-
-    s1.removeSection(&sec1);
-
-    sec1.display();
+    sec1.displayTranscript();
+    // display student 1 sections
+    s2.displayTranscript();
+    s1.displayTranscript();
     return 0;
 }
