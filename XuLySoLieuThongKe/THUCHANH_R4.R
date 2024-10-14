@@ -115,7 +115,8 @@ glimpse(data_bt3)
 data_bt3 <- data_bt3 |> filter(!is.na(dep_delay))
 # -- a)
 set.seed(42)
-data_3a <- sample_n(data_bt3, 250, replace = TRUE) |> filter(year==2013)
+year_2013 <- data_bt3 |> filter(year==2013)
+data_3a <- sample_n(year_2013, 250, replace = TRUE) 
 data_3a
 out_3a <- boot(data_3a$dep_delay, statistic=boot_mu_fun, R=1000)
 
@@ -123,14 +124,16 @@ boot.ci(out_3a, type="perc", conf=0.95)
 
 # -- b)
 set.seed(42)
-data_3b <- sample_n(data_bt3, 300) |> filter(carrier == "UA")
+UA <- data_bt3 |> filter(carrier == "UA")
+data_3b <- sample_n(UA, 300, replace = TRUE) 
 out_3b <- boot(data_3b$dep_delay, statistic=boot_mu_fun, R=1000)
 out_3b
 
 boot.ci(out_3b, type="perc", conf=0.95)
 # -- c)
 set.seed(42)
-data_3c <- sample_n(data_bt3, 250) |> filter(carrier == "DL")
+DL <- data_bt3 |> filter(carrier == "DL")
+data_3c <- sample_n(data_bt3, 250, replace = TRUE) 
 out_3c <- boot(data_3c$dep_delay, statistic=boot_mu_fun, R=1000)
 out_3c
 
@@ -139,11 +142,14 @@ boot.ci(out_3c, type="perc", conf=0.95)
 # ---- BT4 ----
 data_bt4 <- flights
 glimpse(data_bt4)
-UA <- data_bt4 |> filter(!is.na(dep_delay) & carrier == "UA" & dep_delay > 30)
-DL <- data_bt4 |> filter(!is.na(dep_delay) & carrier == "DL" & dep_delay > 30)
+# UA <- data_bt4 |> filter(!is.na(dep_delay) & carrier == "UA")
+# DL <- data_bt4 |> filter(!is.na(dep_delay) & carrier == "DL")
 
-N1 <- nrow(UA) # b)
-N2 <- nrow(DL) # c)
+UA <- data_3b
+UB <- data_3c
+
+N1 <- 300 # b)
+N2 <- 250 # c)
 
 R <- 1000
 Means <- c()
@@ -170,7 +176,6 @@ idx2 <- floor(R*(1-alpha/2))
 Means[idx1]; Means[idx2]
 hist(Means)
 
-hist(Means)
 # ---- BT5 ----
 
 data_bt5 <- flights |> filter(month %in% c(11, 12, 1))
@@ -209,7 +214,7 @@ N <- nrow(whole_data)
 
 R <- 1000
 Ps <- c()
-
+alpha=0.05
 for (i in (0:R)) {
   ind1 <- sample(1:N1, size=N1, replace=TRUE)
   idn2 <- sample(1:N2, size=N2, replace=TRUE)
