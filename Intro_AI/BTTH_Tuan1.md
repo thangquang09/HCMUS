@@ -1,11 +1,11 @@
-# BÀI TẬP THỰC HÀNH TUẦN 1
+# BÁO CÁO BÀI TẬP THỰC HÀNH TUẦN 1
 
 ```
 Họ tên: Lý Quang Thắng
 MSSV: 22110202
 ```
 
-- [BÀI TẬP THỰC HÀNH TUẦN 1](#bài-tập-thực-hành-tuần-1)
+- [BÁO CÁO BÀI TẬP THỰC HÀNH TUẦN 1](#báo-cáo-bài-tập-thực-hành-tuần-1)
   - [1. Chạy tay thuật toán BFS, DFS và UCS](#1-chạy-tay-thuật-toán-bfs-dfs-và-ucs)
     - [1.1. BFS](#11-bfs)
     - [1.2. DFS](#12-dfs)
@@ -18,6 +18,11 @@ MSSV: 22110202
     - [3.1. BFS](#31-bfs)
     - [3.2. DFS](#32-dfs)
     - [3.3. UCS](#33-ucs)
+  - [4. Nhận xét gì về kết quả chạy tay với kết quả chạy trên máy tính.](#4-nhận-xét-gì-về-kết-quả-chạy-tay-với-kết-quả-chạy-trên-máy-tính)
+    - [4.1. BFS](#41-bfs)
+    - [4.2. DFS](#42-dfs)
+    - [4.3. UCS](#43-ucs)
+    - [4.4. Tổng kết lại](#44-tổng-kết-lại)
 
 
 ## 1. Chạy tay thuật toán BFS, DFS và UCS
@@ -675,3 +680,52 @@ Trạng thái hàng đợi và visited khi sử dụng thuật toán UCS sau khi
 Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10, 14, 15, 16, 17]
 Đường đi: (6910, [0, 2, 7, 8, 10, 14, 15, 16, 17])
 ```
+
+## 4. Nhận xét gì về kết quả chạy tay với kết quả chạy trên máy tính.
+
+### 4.1. BFS
+
+**Kết quả thuật toán máy chạy:**
+
+```
+[0, 2, 7, 8, 10, 14, 15, 16, 17]
+```
+
+**Kết quả chạy tay:**
+
+- $0\to 3\to 4\to 13\to 10\to 14\to 15\to 16\to 17$
+- $0\to 2\to 7\to 8\to 10\to 14\to 15\to 16\to 17$
+
+**Nhận xét:** Kết quả tương đồng nhau cho 1 trường hợp, khi chạy tay sẽ có thể lựa chọn được nhiều đường đi hơn, còn với máy thì khi tìm thấy đích nó trả về luôn.
+
+### 4.2. DFS
+
+**Kết quả thuật toán máy chạy:**
+
+```
+[0, 3, 4, 13, 10, 14, 15, 16, 17]
+```
+
+**Kết quả chạy tay:**
+
+- $0\to 3\to 4\to 13\to 10\to 14\to 15\to 16\to 17$
+
+**Nhận xét:** Kết quả là tương đồng nhau.
+
+### 4.3. UCS
+
+**Kết quả thuật toán máy chạy:**
+
+```
+[0, 2, 7, 8, 10, 14, 15, 16, 17] với tổng chi phí là 6910
+```
+
+**Kết quả chạy tay:**
+
+- $0\to 2\to 7\to 8\to 10\to 14\to 15\to 16\to 17$ với chi phí là 6910
+
+**Nhận xét:** Kết quả là tương đồng nhau.
+
+### 4.4. Tổng kết lại
+
+Do Input đầu vào khá đặc biệt có thể làm kết quả Code và kết quả chạy tay tương đồng với nhau. Nhưng khi in ra trạng thái của `frontier` và `visited` trong mỗi vòng lặp như trên, ta mới thấy sự sai logic của thuật toán, đặc biết phần `Uniform Cost Search` đã cho ra kết quả sai ở phần ví dụ trong [2.3.](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
