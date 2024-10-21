@@ -308,7 +308,7 @@ Tóm lại việc cập nhật chi phí là bắt buộc phải có, bởi vì v
 ### 3.1. BFS
 
 ```python
-def fixed_BFS(graph, start, end):
+def fixed_BFS(graph, start, end, isPrint=False):
     visited = []
     frontier = Queue()
 
@@ -321,7 +321,15 @@ def fixed_BFS(graph, start, end):
 
     path_found = False
 
-    while not frontier.empty():
+    while True:
+        if frontier.empty():
+            raise Exception("No way Exception")
+            
+        # chỉ để kiểm tra trạng thái frontier với visited
+        if isPrint:
+            print_queue(frontier)
+            print("  Visited:", visited)
+
         current_node = frontier.get()
         visited.append(current_node)
 
@@ -343,16 +351,96 @@ def fixed_BFS(graph, start, end):
             path.append(parent[end])
             end = parent[end]
         path.reverse()
-    else:
-        raise Exception("No path found")
 
     return path
+```
+
+Ouput xem trạng thái của `frontier` và `visited`:
+
+```output
+Trạng thái hàng đợi và visited khi sử dụng thuật toán BFS ban đầu:
+  Frontier: [ 0 ]
+  Visited: [0]
+  Frontier: [ 1 2 3 ]
+  Visited: [0, 0, 1, 2, 3]
+  Frontier: [ 2 3 6 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6]
+  Frontier: [ 3 6 5 7 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7]
+  Frontier: [ 6 5 7 4 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4]
+  Frontier: [ 5 7 4 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6]
+  Frontier: [ 7 4 11 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11]
+  Frontier: [ 4 11 8 9 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9]
+  Frontier: [ 11 8 9 13 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13]
+  Frontier: [ 8 9 13 12 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12]
+  Frontier: [ 9 13 12 10 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10]
+  Frontier: [ 13 12 10 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9]
+  Frontier: [ 12 10 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13]
+  Frontier: [ 10 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13, 12]
+  Frontier: [ 14 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13, 12, 10, 14]
+  Frontier: [ 15 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13, 12, 10, 14, 14, 15]
+  Frontier: [ 16 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13, 12, 10, 14, 14, 15, 15, 16]
+  Frontier: [ 17 ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 2, 5, 7, 3, 4, 6, 5, 11, 7, 8, 9, 4, 13, 11, 12, 8, 10, 9, 13, 12, 10, 14, 14, 15, 15, 16, 16, 17]
+Đường đi: [0, 2, 7, 8, 10, 14, 15, 16, 17]
+
+Trạng thái hàng đợi và visited khi sử dụng thuật toán BFS sau khi chỉnh sửa:
+  Frontier: [ 0 ]
+  Visited: []
+  Frontier: [ 1 2 3 ]
+  Visited: [0]
+  Frontier: [ 2 3 6 ]
+  Visited: [0, 1]
+  Frontier: [ 3 6 5 7 ]
+  Visited: [0, 1, 2]
+  Frontier: [ 6 5 7 4 ]
+  Visited: [0, 1, 2, 3]
+  Frontier: [ 5 7 4 ]
+  Visited: [0, 1, 2, 3, 6]
+  Frontier: [ 7 4 11 ]
+  Visited: [0, 1, 2, 3, 6, 5]
+  Frontier: [ 4 11 8 9 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7]
+  Frontier: [ 11 8 9 13 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4]
+  Frontier: [ 8 9 13 12 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11]
+  Frontier: [ 9 13 12 10 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8]
+  Frontier: [ 13 12 10 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9]
+  Frontier: [ 12 10 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13]
+  Frontier: [ 10 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13, 12]
+  Frontier: [ 14 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13, 12, 10]
+  Frontier: [ 15 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13, 12, 10, 14]
+  Frontier: [ 16 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13, 12, 10, 14, 15]
+  Frontier: [ 17 ]
+  Visited: [0, 1, 2, 3, 6, 5, 7, 4, 11, 8, 9, 13, 12, 10, 14, 15, 16]
+Đường đi: [0, 2, 7, 8, 10, 14, 15, 16, 17]
 ```
 
 ### 3.2. DFS
 
 ```python
-def fixed_DFS(graph, start, end):
+def fixed_DFS(graph, start, end, isPrint=False):
     visited = []
     frontier = []  # List dùng như stack
 
@@ -365,7 +453,14 @@ def fixed_DFS(graph, start, end):
 
     path_found = False
 
-    while frontier:  # Điều kiện thoát hợp lý
+    while True:
+        if frontier == []:
+            raise Exception("No way Exception")
+        # chỉ để kiểm tra trạng thái frontier với visited
+        if isPrint:
+            print("  Frontier:", frontier)
+            print("  Visited:", visited)
+
         current_node = frontier.pop()
         visited.append(current_node)
 
@@ -379,6 +474,8 @@ def fixed_DFS(graph, start, end):
                 frontier.append(node)
                 parent[node] = current_node
 
+        
+
     # Xây dựng đường đi
     path = []
     if path_found:
@@ -387,16 +484,59 @@ def fixed_DFS(graph, start, end):
             path.append(parent[end])
             end = parent[end]
         path.reverse()
-    else:
-        raise Exception("No path found")
 
     return path
+```
+
+Ouput xem trạng thái của `frontier` và `visited`:
+
+```output
+Trạng thái hàng đợi và visited khi sử dụng thuật toán DFS ban đầu:
+  Frontier: [0]
+  Visited: [0]
+  Frontier: [1, 2, 3]
+  Visited: [0, 0, 1, 2, 3]
+  Frontier: [1, 2, 4]
+  Visited: [0, 0, 1, 2, 3, 3, 4]
+  Frontier: [1, 2, 13]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13]
+  Frontier: [1, 2, 10]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13, 13, 10]
+  Frontier: [1, 2, 9, 14]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13, 13, 10, 10, 9, 14]
+  Frontier: [1, 2, 9, 15]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13, 13, 10, 10, 9, 14, 14, 15]
+  Frontier: [1, 2, 9, 16]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13, 13, 10, 10, 9, 14, 14, 15, 15, 16]
+  Frontier: [1, 2, 9, 17]
+  Visited: [0, 0, 1, 2, 3, 3, 4, 4, 13, 13, 10, 10, 9, 14, 14, 15, 15, 16, 16, 17]
+Đường đi: [0, 3, 4, 13, 10, 14, 15, 16, 17]
+Trạng thái hàng đợi và visited khi sử dụng thuật toán DFS sau khi chỉnh sửa:
+  Frontier: [0]
+  Visited: []
+  Frontier: [1, 2, 3]
+  Visited: [0]
+  Frontier: [1, 2, 4]
+  Visited: [0, 3]
+  Frontier: [1, 2, 13]
+  Visited: [0, 3, 4]
+  Frontier: [1, 2, 10]
+  Visited: [0, 3, 4, 13]
+  Frontier: [1, 2, 9, 14]
+  Visited: [0, 3, 4, 13, 10]
+  Frontier: [1, 2, 9, 15]
+  Visited: [0, 3, 4, 13, 10, 14]
+  Frontier: [1, 2, 9, 16]
+  Visited: [0, 3, 4, 13, 10, 14, 15]
+  Frontier: [1, 2, 9, 17]
+  Visited: [0, 3, 4, 13, 10, 14, 15, 16]
+Đường đi: [0, 3, 4, 13, 10, 14, 15, 16, 17]
 ```
 
 ### 3.3. UCS
 
 ```python
-def fixed_UCS(graph, start, end):
+def fixed_UCS(graph, start, end, isPrint=False):
     visited = []
     frontier = PriorityQueue()
     frontier.put((0, start))  # Thêm node start với chi phí 0
@@ -410,7 +550,14 @@ def fixed_UCS(graph, start, end):
 
     path_found = False
 
-    while not frontier.empty():
+    while True:
+        if frontier.empty():
+            raise Exception("No way Exception")
+        # chỉ để kiểm tra trạng thái frontier với visited
+        if isPrint:
+            print_queue(frontier)
+            print("  Visited:", visited)
+
         current_w, current_node = frontier.get()
         visited.append(current_node)
 
@@ -428,7 +575,11 @@ def fixed_UCS(graph, start, end):
                 cost[node] = new_cost
                 frontier.put((new_cost, node))
                 parent[node] = current_node
-                
+
+    # kiểm tra visited (đây là phần thêm vào để kiểm tra)
+    if isPrint:
+        print("Visited:", visited)
+
     # Xây dựng đường đi
     path = []
     if path_found:
@@ -437,8 +588,90 @@ def fixed_UCS(graph, start, end):
             path.append(parent[end])
             end = parent[end]
         path.reverse()
-    else:
-        raise Exception("No path found")
 
     return cost[current_node], path
+```
+
+Ouput xem trạng thái của `frontier` và `visited`:
+
+```output
+Trạng thái hàng đợi và visited khi sử dụng thuật toán UCS ban đầu:
+  Frontier: [ (0, 0) ]
+  Visited: [0]
+  Frontier: [ (50, 1) (300, 3) (350, 2) ]
+  Visited: [0, 0, 1, 2, 3]
+  Frontier: [ (300, 3) (350, 2) (650, 6) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6]
+  Frontier: [ (350, 2) (650, 6) (1600, 4) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4]
+  Frontier: [ (450, 5) (650, 6) (1250, 7) (1600, 4) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7]
+  Frontier: [ (650, 6) (1150, 11) (1250, 7) (1600, 4) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11]
+  Frontier: [ (1150, 11) (1250, 7) (1600, 4) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6]
+  Frontier: [ (1250, 7) (1600, 4) (2100, 12) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12]
+  Frontier: [ (1550, 9) (1600, 4) (2040, 8) (2100, 12) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9]
+  Frontier: [ (1600, 4) (2040, 8) (2100, 12) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9]
+  Frontier: [ (2040, 8) (2100, 12) (3000, 13) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13]
+  Frontier: [ (2100, 12) (3000, 13) (3240, 10) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10]
+  Frontier: [ (3000, 13) (3240, 10) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12]
+  Frontier: [ (3240, 10) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12, 13]
+  Frontier: [ (3640, 14) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12, 13, 10, 14]
+  Frontier: [ (4940, 15) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12, 13, 10, 14, 14, 15]
+  Frontier: [ (5710, 16) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12, 13, 10, 14, 14, 15, 15, 16]
+  Frontier: [ (6910, 17) ]
+  Visited: [0, 0, 1, 2, 3, 1, 6, 3, 4, 2, 5, 7, 5, 11, 6, 11, 12, 7, 8, 9, 9, 4, 13, 8, 10, 12, 13, 10, 14, 14, 15, 15, 16, 16, 17]
+Đường đi: (6910, [0, 2, 7, 8, 10, 14, 15, 16, 17])
+Trạng thái hàng đợi và visited khi sử dụng thuật toán UCS sau khi chỉnh sửa:
+  Frontier: [ (0, 0) ]
+  Visited: []
+  Frontier: [ (50, 1) (300, 3) (350, 2) ]
+  Visited: [0]
+  Frontier: [ (300, 3) (350, 2) (650, 6) ]
+  Visited: [0, 1]
+  Frontier: [ (350, 2) (650, 6) (1600, 4) ]
+  Visited: [0, 1, 3]
+  Frontier: [ (450, 5) (650, 6) (1250, 7) (1600, 4) ]
+  Visited: [0, 1, 3, 2]
+  Frontier: [ (650, 6) (1150, 11) (1250, 7) (1600, 4) ]
+  Visited: [0, 1, 3, 2, 5]
+  Frontier: [ (1150, 11) (1250, 7) (1600, 4) ]
+  Visited: [0, 1, 3, 2, 5, 6]
+  Frontier: [ (1250, 7) (1600, 4) (2100, 12) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11]
+  Frontier: [ (1550, 9) (1600, 4) (2040, 8) (2100, 12) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7]
+  Frontier: [ (1600, 4) (2040, 8) (2100, 12) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9]
+  Frontier: [ (2040, 8) (2100, 12) (3000, 13) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4]
+  Frontier: [ (2100, 12) (3000, 13) (3240, 10) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8]
+  Frontier: [ (2700, 13) (3000, 13) (3240, 10) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12]
+  Frontier: [ (3000, 13) (3240, 10) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13]
+  Frontier: [ (3240, 10) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13]
+  Frontier: [ (3640, 14) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10]
+  Frontier: [ (4940, 15) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10, 14]
+  Frontier: [ (5710, 16) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10, 14, 15]
+  Frontier: [ (6910, 17) ]
+  Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10, 14, 15, 16]
+Visited: [0, 1, 3, 2, 5, 6, 11, 7, 9, 4, 8, 12, 13, 13, 10, 14, 15, 16, 17]
+Đường đi: (6910, [0, 2, 7, 8, 10, 14, 15, 16, 17])
 ```
