@@ -1,5 +1,10 @@
 # BÀI TẬP THỰC HÀNH TUẦN 1
 
+```
+Họ tên: Lý Quang Thắng
+MSSV: 22110202
+```
+
 - [BÀI TẬP THỰC HÀNH TUẦN 1](#bài-tập-thực-hành-tuần-1)
   - [1. Chạy tay thuật toán BFS, DFS và UCS](#1-chạy-tay-thuật-toán-bfs-dfs-và-ucs)
     - [1.1. BFS](#11-bfs)
@@ -93,8 +98,9 @@ Tiến hành giải tay:
 - PQ = {(4, 1600), (8, 2040), (12, 2100)}
 - PQ = {(8, 2040), (12, 2100), (13, 3000)}
 - PQ = {(12, 2100), (13, 3000), (10, 3240)}
-- PQ = {(13, 2700), (10, 3240)} thay thế đường đi tới 13 bởi đường đi từ 12 tới 13
-- PQ = {(10, 3240)}
+- PQ = {(13, 2700), (13, 3000), (10, 3240)} có đường đi mới đến 13 có chi phí ít hơn
+- PQ = {(13, 3000), (10, 3240)}
+- PQ = {(10, 3240)} có đường mới đến 13 với chi phí cao hơn 13 đã có trong PQ nên bỏ qua
 - PQ = {(14, 3640)}
 - PQ = {(15, 4940)}
 - PQ = {(16, 5710)}
@@ -211,3 +217,109 @@ Riêng trong thuật toán `Uniform Cost Search` có thể dẫn đến sai lệ
 
 ### 2.3. Không đảm bảo cập nhật trọng số tối ưu trong Uniform Cost Search 
 
+Xét một ví dụ nếu vẫn giữ nguyên code và phần `visited.append(node)` ở phần [2.2](#22-sai-lầm-logic-khi-thêm-các-trạng-thái-có-thể-xảy-ra-tiếp-theo-vào-visited) thì ta sẽ gặp tình trạng sau. Thử với một đồ thị đơn giản
+
+Đây là ví dụ 2.3.1 trong file Code
+
+```python
+graph_3 = {
+    'A': [('B', 1), ('C', 5)],
+    'B': [('C', 1), ('D', 4)],
+    'C': [('D', 1)],
+    'D': []
+}
+
+cost, path = UCS(start='A', end='D', graph=graph_3)
+print("Chi phí tiêu tốn:", cost)
+print("Đường đi", path) # kết quả nên là A -> B -> C -> D với chi phí = 3
+```
+Output:
+```output
+Chi phí tiêu tốn: 5
+Đường đi ['A', 'B', 'D']
+```
+
+Trong khi dễ dàng quan sát được đường đi ít tốt chi phí nhất là $A \to B \to C \to D$ với chỉ 3.
+
+Còn khi đã bỏ đi nó sẽ có chạy ra đáp án đúng, nhưng chưa đủ. Bởi vì nếu không đặt visited trong vòng for thì nó rất có thể sẽ chạy ra rất nhiều phương án không tối ưu từ đó sẽ làm mất nhiều thời gian hơn để đến được kết quả cuối cùng.
+
+Đây là ví dụ 2.3.2 trong file Code, lưu ý rằng ví dụ đã comment dòng `visited.append(node)`:
+
+Ta sẽ có thêm hàm `printQueue()` dùng để quan sát trạng thái của hàng đợi trong mỗi lần lặp:
+
+```python
+# Hàm printQueue hoạt động chỉ để test thử thuật toán, nó lấy tẩt cả phần tử ra xong gắn vào lại
+def printQueue(q):
+    tmp = PriorityQueue()
+    while not q.empty():
+        a = q.get()
+        tmp.put(a)
+        print(a, end = " ")
+    print()
+    return tmp
+```
+
+Và tinh chỉnh lại hàm UCS để phù hợp với việc test.
+
+Ta có kết quả khi chạy với cùng start, end, graph như code cũ: 
+
+```output
+(0, 0)  
+(50, 1)  (300, 3)  (350, 2)  
+(300, 3)  (350, 2)  (650, 6)  
+(350, 2)  (650, 6)  (1600, 4)  
+(450, 5)  (650, 6)  (1250, 7)  (1600, 4)  
+(650, 6)  (1150, 11)  (1250, 7)  (1600, 4)  
+(1150, 11)  (1250, 7)  (1600, 4)  
+(1250, 7)  (1600, 4)  (2100, 12)  
+(1550, 9)  (1600, 4)  (2040, 8)  (2100, 12)  
+(1600, 4)  (2040, 8)  (2100, 12)  
+(2040, 8)  (2100, 12)  (3000, 13)  
+(2100, 12)  (3000, 13)  (3240, 10)  
+(2700, 13)  (3000, 13)  (3240, 10)  
+(3000, 13)  (3240, 10)  (4000, 10)  
+(3240, 10)  (4000, 10)  (4300, 10)  
+(3640, 14)  (4000, 10)  (4300, 10)  
+(4000, 10)  (4300, 10)  (4940, 15)  
+(4300, 10)  (4940, 15)  
+(4940, 15)  
+(5710, 16)  
+(6910, 17)
+```
+
+Có thể thấy ở phần 
+
+```
+(2100, 12)  (3000, 13)  (3240, 10)  
+(2700, 13)  (3000, 13)  (3240, 10)  
+(3000, 13)  (3240, 10)  (4000, 10)  
+(3240, 10)  (4000, 10)  (4300, 10)  
+(3640, 14)  (4000, 10)  (4300, 10)  
+(4000, 10)  (4300, 10)  (4940, 15)  
+(4300, 10)  (4940, 15)  
+```
+
+Do bỏ đi visited trong vòng for nên node số 13 và số 10 đã gây ra quá trình lặp chồng chéo nhau, do chưa được thăm.
+
+Giải pháp: Ta cần có thêm một dictionary để lưu lại chi phí đường đi như sau
+
+```python
+cost = dict()
+cost[start] = 0
+```
+
+Và điều kiện để thêm vào hàng đợi trong vòng for là
+
+```python
+for nodei in graph[current_node]:
+    node, weight = nodei
+    new_cost = current_w + weight
+
+    # Nếu node chưa được thăm hoặc tìm thấy đường đi rẻ hơn
+    if node not in visited and (node not in cost or new_cost < cost[node]):
+        cost[node] = new_cost
+        frontier.put((new_cost, node))
+        parent[node] = current_node
+```
+
+Điều kiện trên nghĩa là `node` đang xét sẽ không có trong `cost`, hoặc có với chi phí đường đi mới rẻ hơn chi phí đường đi đã tồn tại trước đó
