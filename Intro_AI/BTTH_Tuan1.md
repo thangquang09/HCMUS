@@ -11,9 +11,13 @@ MSSV: 22110202
     - [1.2. DFS](#12-dfs)
     - [1.3. UCS](#13-ucs)
   - [2. Kiểm tra tính đúng đắn của các thuật toán đã cho sẵn code như trên. Nếu chưa đúng thì em sửa lại như thế nào cho phù hợp?](#2-kiểm-tra-tính-đúng-đắn-của-các-thuật-toán-đã-cho-sẵn-code-như-trên-nếu-chưa-đúng-thì-em-sửa-lại-như-thế-nào-cho-phù-hợp)
-    - [2.1. Sự dư thừa khi vừa khởi tạo thuật toán đã thêm node start vào visited](#21-sự-dư-thừa-khi-vừa-khởi-tạo-thuật-toán-đã-thêm-node-start-vào-visited)
+    - [2.1. Sự dư thừa khi thêm node start vào visited khi khởi tạo thuật toán](#21-sự-dư-thừa-khi-thêm-node-start-vào-visited-khi-khởi-tạo-thuật-toán)
     - [2.2. Sai lầm logic khi thêm các trạng thái có thể xảy ra tiếp theo vào visited](#22-sai-lầm-logic-khi-thêm-các-trạng-thái-có-thể-xảy-ra-tiếp-theo-vào-visited)
     - [2.3. Không đảm bảo cập nhật trọng số tối ưu trong Uniform Cost Search](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
+  - [3. Sửa lại code](#3-sửa-lại-code)
+    - [3.1. BFS](#31-bfs)
+    - [3.2. DFS](#32-dfs)
+    - [3.3. UCS](#33-ucs)
 
 
 ## 1. Chạy tay thuật toán BFS, DFS và UCS
@@ -112,7 +116,7 @@ Vậy đường đi từ 0 đế 17 với chi phí ít nhất là:
 
 ## 2. Kiểm tra tính đúng đắn của các thuật toán đã cho sẵn code như trên. Nếu chưa đúng thì em sửa lại như thế nào cho phù hợp?
 
-### 2.1. Sự dư thừa khi vừa khởi tạo thuật toán đã thêm node start vào visited
+### 2.1. Sự dư thừa khi thêm node start vào visited khi khởi tạo thuật toán
 
 Trong cả 3 thuật toán đã cho code sẵn đều có lỗi chung như sau:
 - Thêm vào node start vào trong visited khi vừa khởi tạo các frontier, visited, parent
@@ -156,7 +160,7 @@ while True:
     if frontier.empty():
         raise Exception("No way Exception")
     current_w, current_node = frontier.get()
-    visited.append(current_node)
+    visited.append(current_node) # <- sẽ được thêm vào ở dòng code này
     # ...
 ```
 
@@ -170,12 +174,9 @@ Nghĩa là mọi lần chạy thuật toán thì start đều được append 2 
 
 Tương tự với DFS và UCS cũng như vậy, em sẽ sửa lại như sau: xóa bỏ dòng `visited.append(start)` mỗi khi khởi tạo bài toán để đỡ dư thừa trong quá trình chạy code.
 
-
-- Trong vòng for để tìm các trạng thái tiếp theo mà node hiện tại đi tiếp được thì thêm các trạng thái đó vào trong visited
-
 ### 2.2. Sai lầm logic khi thêm các trạng thái có thể xảy ra tiếp theo vào visited
 
-Trong cả 3 thuật toán em đều thấy có một phần sai lầm có thể sẽ ảnh hưởng đến thụât toán, đó là thêm các trạng thái tiếp theo có thể xảy ra từ trạng thái hiện tại dù nó chưa được duyệt vào list visited. Các code như sau:
+Trong cả ba thuật toán BFS, DFS, và UCS, có một sai lầm logic phổ biến có thể ảnh hưởng đến kết quả của thuật toán, đó là việc thêm các trạng thái tiếp theo (các node kề) vào danh sách `visited` trước khi node đó được lấy ra khỏi hàng đợi `queue` hoặc ngăn xếp `stack`. Điều này không tuân theo logic chính xác của các thuật toán duyệt đồ thị.
 
 ```python
     #### BFS ####
@@ -184,7 +185,7 @@ Trong cả 3 thuật toán em đều thấy có một phần sai lầm có thể
         if node not in visited:
             frontier.put(node)
             parent[node] = current_node
-            visited.append(node) # không được phép append vào visited ở đây
+            visited.append(node) # sai logic khi append vào đây (sẽ viết rõ trong báo cáo)
 ```
 
 
@@ -195,7 +196,7 @@ Trong cả 3 thuật toán em đều thấy có một phần sai lầm có thể
         if node not in visited:
             frontier.append(node)
             parent[node] = current_node
-            visited.append(node) # không được phép append vào visited ở đây
+            visited.append(node) # sai logic khi append vào đây (sẽ viết rõ trong báo cáo)
 ```
 
 ```python
@@ -206,20 +207,28 @@ Trong cả 3 thuật toán em đều thấy có một phần sai lầm có thể
         if node not in visited:
             frontier.put((current_w + weight, node))
             parent[node] = current_node
-            visited.append(node) # không được phép append vào visited ở đây
+            visited.append(node) # sai logic khi append vào đây (sẽ viết rõ trong báo cáo)
 ```
 
-Điều này hoàn toàn sai logic, bởi vì một node được gọi là **đã thăm** khi và chỉ khi nó đã được lấy ra khỏi `frontier`. Vì vậy nếu thêm dòng `visited.append(node)` vào trong vòng lặp for thì em nghĩ nó sẽ sai về mặt logic và có thể ảnh hưởng đến kết quả của thuật toán.
+Một `node` chỉ được coi là đã thăm khi nó được lấy ra khỏi **hàng đợi** hoặc **ngăn xếp** để xử lý, tức là sau khi tất cả các node kề của nó đã được đưa vào hàng đợi/ngăn xếp. Nếu một node được thêm vào `visited` quá sớm, nó sẽ bị đánh dấu là "đã thăm" ngay cả khi chưa thực sự được xử lý, dẫn đến bỏ qua các đường đi tiềm năng khác có thể đến node này qua những node khác.
 
-Riêng trong thuật toán `Uniform Cost Search` có thể dẫn đến sai lệch kết quả. Sẽ giải thích và nêu ví dụ trong phần [2.3](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
+**Giải pháp:** Để sửa thì em nghĩ nên xóa bỏ dòng `visited.append(node)` trong mỗi thuật toán ở vòng for, như vậy sẽ phù hợp về mặt logic. Và để tránh sẽ có nhiều giá trị trùng lặp trong `frontier`, trong vòng for em kiểm tra nó phải vừa không năm trong `visited` và không ở trong `frontier`
 
-Để sửa thì em nghĩ nên xóa bỏ dòng `visited.append(node)` trong mỗi thuật toán ở vòng for, như vậy sẽ phù hợp về mặt logic.
+- Với **BFS** và **DFS**, chỉ cần đảm bảo rằng node được thêm vào `visited` sau khi nó được lấy ra từ `frontier`. Ngoài ra, ta có thể kiểm tra thêm điều kiện để `node` không được thêm lại vào `frontier` nếu nó đã có trong `visited` hoặc trong hàng đợi.
+
+```python
+if node not in visited and node not in frontier.queue:
+    frontier.put(node)
+    parent[node] = current_node
+```
+
+- Với **UCS**, ngoài việc kiểm tra như trên, ta cần đảm bảo rằng nếu có một đường đi mới rẻ hơn đến node đã có trong hàng đợi, chi phí của node đó cần được cập nhật. Điều này sẽ được giải thích rõ trong phần tiếp theo [2.3.](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
 
 ### 2.3. Không đảm bảo cập nhật trọng số tối ưu trong Uniform Cost Search 
 
-Xét một ví dụ nếu vẫn giữ nguyên code và phần `visited.append(node)` ở phần [2.2](#22-sai-lầm-logic-khi-thêm-các-trạng-thái-có-thể-xảy-ra-tiếp-theo-vào-visited) thì ta sẽ gặp tình trạng sau. Thử với một đồ thị đơn giản
+Khi đã xử lý xong việc append node trong vòng for nhưng vẫn còn điểm chưa đúng trong thuật toán Uniform Cost Search, ta xét ví dụ sau:
 
-Đây là ví dụ 2.3.1 trong file Code
+Đây là `ví dụ 2.3.1` trong file Code
 
 ```python
 graph_3 = {
@@ -239,76 +248,22 @@ Chi phí tiêu tốn: 5
 Đường đi ['A', 'B', 'D']
 ```
 
-Trong khi dễ dàng quan sát được đường đi ít tốt chi phí nhất là $A \to B \to C \to D$ với chỉ 3.
+Trong khi dễ dàng quan sát được đường đi ít tốn chi phí nhất là $A \to B \to C \to D$ với chỉ 3. Là do ta không cập nhật những trọng số mà tối ưu hơn khi duyệt các node kề với đỉnh.
 
-Còn khi đã bỏ đi nó sẽ có chạy ra đáp án đúng, nhưng chưa đủ. Bởi vì nếu không đặt visited trong vòng for thì nó rất có thể sẽ chạy ra rất nhiều phương án không tối ưu từ đó sẽ làm mất nhiều thời gian hơn để đến được kết quả cuối cùng.
 
-Đây là ví dụ 2.3.2 trong file Code, lưu ý rằng ví dụ đã comment dòng `visited.append(node)`:
-
-Ta sẽ có thêm hàm `printQueue()` dùng để quan sát trạng thái của hàng đợi trong mỗi lần lặp:
-
-```python
-# Hàm printQueue hoạt động chỉ để test thử thuật toán, nó lấy tẩt cả phần tử ra xong gắn vào lại
-def printQueue(q):
-    tmp = PriorityQueue()
-    while not q.empty():
-        a = q.get()
-        tmp.put(a)
-        print(a, end = " ")
-    print()
-    return tmp
-```
-
-Và tinh chỉnh lại hàm UCS để phù hợp với việc test.
-
-Ta có kết quả khi chạy với cùng start, end, graph như code cũ: 
-
-```output
-(0, 0)  
-(50, 1)  (300, 3)  (350, 2)  
-(300, 3)  (350, 2)  (650, 6)  
-(350, 2)  (650, 6)  (1600, 4)  
-(450, 5)  (650, 6)  (1250, 7)  (1600, 4)  
-(650, 6)  (1150, 11)  (1250, 7)  (1600, 4)  
-(1150, 11)  (1250, 7)  (1600, 4)  
-(1250, 7)  (1600, 4)  (2100, 12)  
-(1550, 9)  (1600, 4)  (2040, 8)  (2100, 12)  
-(1600, 4)  (2040, 8)  (2100, 12)  
-(2040, 8)  (2100, 12)  (3000, 13)  
-(2100, 12)  (3000, 13)  (3240, 10)  
-(2700, 13)  (3000, 13)  (3240, 10)  
-(3000, 13)  (3240, 10)  (4000, 10)  
-(3240, 10)  (4000, 10)  (4300, 10)  
-(3640, 14)  (4000, 10)  (4300, 10)  
-(4000, 10)  (4300, 10)  (4940, 15)  
-(4300, 10)  (4940, 15)  
-(4940, 15)  
-(5710, 16)  
-(6910, 17)
-```
-
-Có thể thấy ở phần 
-
-```
-(2100, 12)  (3000, 13)  (3240, 10)  
-(2700, 13)  (3000, 13)  (3240, 10)  
-(3000, 13)  (3240, 10)  (4000, 10)  
-(3240, 10)  (4000, 10)  (4300, 10)  
-(3640, 14)  (4000, 10)  (4300, 10)  
-(4000, 10)  (4300, 10)  (4940, 15)  
-(4300, 10)  (4940, 15)  
-```
-
-Do bỏ đi visited trong vòng for nên node số 13 và số 10 đã gây ra quá trình lặp chồng chéo nhau, do chưa được thăm.
-
-Giải pháp: Ta cần có thêm một dictionary để lưu lại chi phí đường đi như sau
+**Giải pháp:** Ta cần có thêm một dictionary để lưu lại chi phí đường đi đến mỗi node từ điểm bắt đầu, đảm bảo rằng chúng ta luôn theo dõi chi phí thấp nhất và cập nhật nó khi tìm thấy một đường đi ngắn hơn.
 
 ```python
 cost = dict()
-cost[start] = 0
+cost[start] = 0 # Chi phí từ điểm bắt đầu đến chính nó là 0
 ```
 
-Và điều kiện để thêm vào hàng đợi trong vòng for là
+**Điều kiện thêm vào hàng đợi:**
+
+Khi duyệt qua các node kề của `current_node`, ta cần tính toán tổng chi phí của đường đi từ điểm bắt đầu đến node kề này. Sau đó, điều kiện để thêm node vào hàng đợi `frontier` sẽ là:
+
+- Node chưa được thăm: Đảm bảo node chưa được duyệt qua.
+- Tìm thấy đường đi rẻ hơn: Nếu đã có chi phí đến node này nhưng đường đi mới tìm thấy rẻ hơn, ta sẽ cập nhật lại chi phí.
 
 ```python
 for nodei in graph[current_node]:
@@ -322,4 +277,168 @@ for nodei in graph[current_node]:
         parent[node] = current_node
 ```
 
-Điều kiện trên nghĩa là `node` đang xét sẽ không có trong `cost`, hoặc có với chi phí đường đi mới rẻ hơn chi phí đường đi đã tồn tại trước đó
+Điều kiện này đảm bảo rằng node chỉ được thêm vào hàng đợi nếu chưa được thăm hoặc nếu chi phí để đến node này qua đường đi mới rẻ hơn chi phí đã lưu trước đó. Cơ chế này không chỉ giúp tránh thêm node nhiều lần, mà còn đảm bảo rằng thuật toán luôn ưu tiên duyệt các đường đi có chi phí thấp hơn, từ đó tìm ra đường đi ngắn nhất.
+
+**Giải thích chi tiết code trên:**
+
+- `new_cost = current_w + weight:` Tính toán chi phí từ điểm bắt đầu đến `node` qua `current_node`. Tổng chi phí này là chi phí đến `current_node` cộng thêm trọng số của cạnh nối `current_node` và `node`.
+
+- `if node not in visited and (node not in cost or new_cost < cost[node]):` Đây là phần quan trọng của thuật toán UCS. Nó đảm bảo rằng:
+
+  - Node chỉ được thêm vào hàng đợi nếu nó chưa được thăm.
+  - Nếu node đã có trong `cost` (tức là đã có một đường đi tới nó), ta chỉ cập nhật nếu đường đi mới tìm thấy rẻ hơn so với đường đi cũ.
+  cost[node] = new_cost: Cập nhật chi phí ngắn nhất tới node đó.
+
+- `frontier.put((new_cost, node)):` Thêm node vào hàng đợi ưu tiên với chi phí mới. Vì UCS sử dụng **PriorityQueue**, node có chi phí thấp nhất sẽ được lấy ra trước để duyệt tiếp.
+
+- `parent[node] = current_node:` Lưu lại node cha (node trước đó) để có thể xây dựng lại đường đi ngắn nhất sau khi tìm được đích đến.
+
+**Lợi ích của giải pháp**
+
+- Đảm bảo tính tối ưu: Sử dụng `dictionary cost` giúp đảm bảo rằng mỗi node luôn được duyệt với chi phí thấp nhất. Điều này rất quan trọng trong `UCS`, vì thuật toán hoạt động dựa trên việc so sánh chi phí để tìm đường đi tối ưu.
+
+- Giảm trùng lặp: Điều kiện `new_cost < cost[node]` giúp loại bỏ việc thêm node nhiều lần với các chi phí khác nhau, từ đó giảm thiểu trùng lặp và tăng hiệu suất của thuật toán.
+
+- Xây dựng đường đi chính xác: Với việc cập nhật `parent[node] = current_node` mỗi khi tìm thấy đường đi tốt hơn, chúng ta đảm bảo rằng đường đi từ điểm bắt đầu đến điểm kết thúc là tối ưu.
+
+Tóm lại việc cập nhật chi phí là bắt buộc phải có, bởi vì ví dụ đã nêu ở trên, thuật toán UCS cô cung cấp đã hoạt động sai.
+
+## 3. Sửa lại code
+
+### 3.1. BFS
+
+```python
+def fixed_BFS(graph, start, end):
+    visited = []
+    frontier = Queue()
+
+    # thêm node vào frontier
+    frontier.put(start)
+
+    # start không có node cha
+    parent = dict()
+    parent[start] = None
+
+    path_found = False
+
+    while not frontier.empty():
+        current_node = frontier.get()
+        visited.append(current_node)
+
+        # Kiểm tra current_node có phải end hay không
+        if current_node == end:
+            path_found = True
+            break
+
+        for node in graph[current_node]:
+            if node not in visited and node not in frontier.queue:  # Kiểm tra nếu node chưa được thêm vào frontier
+                frontier.put(node)
+                parent[node] = current_node
+
+    # Xây dựng đường đi
+    path = []
+    if path_found:
+        path.append(end)
+        while parent[end] is not None:
+            path.append(parent[end])
+            end = parent[end]
+        path.reverse()
+    else:
+        raise Exception("No path found")
+
+    return path
+```
+
+### 3.2. DFS
+
+```python
+def fixed_DFS(graph, start, end):
+    visited = []
+    frontier = []  # List dùng như stack
+
+    # thêm node start vào frontier
+    frontier.append(start)
+
+    # start không có node cha
+    parent = dict()
+    parent[start] = None
+
+    path_found = False
+
+    while frontier:  # Điều kiện thoát hợp lý
+        current_node = frontier.pop()
+        visited.append(current_node)
+
+        # Kiểm tra xem current_node có phải end hay không
+        if current_node == end:
+            path_found = True
+            break
+
+        for node in graph[current_node]:
+            if node not in visited and node not in frontier:  # Kiểm tra nếu node chưa được thêm vào frontier
+                frontier.append(node)
+                parent[node] = current_node
+
+    # Xây dựng đường đi
+    path = []
+    if path_found:
+        path.append(end)
+        while parent[end] is not None:
+            path.append(parent[end])
+            end = parent[end]
+        path.reverse()
+    else:
+        raise Exception("No path found")
+
+    return path
+```
+
+### 3.3. UCS
+
+```python
+def fixed_UCS(graph, start, end):
+    visited = []
+    frontier = PriorityQueue()
+    frontier.put((0, start))  # Thêm node start với chi phí 0
+
+    parent = dict()
+    parent[start] = None
+
+    # Khởi tạo biến cost để theo dõi chi phí đến mỗi node
+    cost = dict()
+    cost[start] = 0
+
+    path_found = False
+
+    while not frontier.empty():
+        current_w, current_node = frontier.get()
+        visited.append(current_node)
+
+        # Kiểm tra xem current_node có phải là end không
+        if current_node == end:
+            path_found = True
+            break
+
+        for nodei in graph[current_node]:
+            node, weight = nodei
+            new_cost = current_w + weight
+
+            # Nếu node chưa được thăm hoặc tìm thấy đường đi rẻ hơn
+            if node not in visited and (node not in cost or new_cost < cost[node]):
+                cost[node] = new_cost
+                frontier.put((new_cost, node))
+                parent[node] = current_node
+                
+    # Xây dựng đường đi
+    path = []
+    if path_found:
+        path.append(end)
+        while parent[end] is not None:
+            path.append(parent[end])
+            end = parent[end]
+        path.reverse()
+    else:
+        raise Exception("No path found")
+
+    return cost[current_node], path
+```
