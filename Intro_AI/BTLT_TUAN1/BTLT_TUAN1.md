@@ -274,7 +274,7 @@ Giả sử có một nút đích không tối ưu (suboptimal goal) G2 nằm tro
 - Vì G2 là một nút đích, nên $h(G2)=0$
 - Từ đó ta có $f(\text{G2}) = g(\text{G2}) + h(\text{G2}) = g(\text{G2}) + 0 = g(\text{G2})$
 
-Vậy $$\begin{equation} f(\text{G2}) > C^* \end{equation}$$
+Vậy $$\begin{equation} f(\text{G2}) > C^* \tag{1} \end{equation}$$
 
 Xét một nút $n$ nằm trên đường đi tối ưu và ở trong **fringe**, ta chứng minh rằng $f(n) \leq C^*$
 - Vì $n$ nằm trên đường đi tối ưu, nên tổng chi phí từ nút bắt đầu qua $n$ xong tới đích là $C^*$
@@ -283,12 +283,13 @@ Xét một nút $n$ nằm trên đường đi tối ưu và ở trong **fringe**
 - Vì $h(n)$ là admissible, nên $h(n) \leq h^*(n)$
 - Từ đó ta có $f(n) = g(n) + h(n) \leq g(n) + h^*(n) = C^*$
 
-Vậy $$\begin{equation} f(\text{n}) \leq C^* \end{equation}$$
+Vậy $$\begin{equation} f(\text{n}) \leq C^* \tag{2} \end{equation}$$
 
 Từ $(1)$ và $(2)$ ta có được 
 $$
 \begin{equation}
 f(n) \leq C^* < f(G2)
+\tag{3}
 \end{equation}
 $$
 
