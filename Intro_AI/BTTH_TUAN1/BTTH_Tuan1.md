@@ -227,7 +227,7 @@ if node not in visited and node not in frontier.queue:
     parent[node] = current_node
 ```
 
-- Với **UCS**, ngoài việc kiểm tra như trên, ta cần đảm bảo rằng nếu có một đường đi mới rẻ hơn đến node đã có trong hàng đợi, chi phí của node đó cần được cập nhật. Điều này sẽ được giải thích rõ trong phần tiếp theo [2.3.](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
+- Với **UCS**, thì chỉ cần bỏ đi phần kiểm tra `visited` nhưng không thêm ràng buộc kiểm tra trong `frontier` bởi vì nếu có một đường đi từ gốc tới nó có chi phí tốt hơn thì việc kiểm tra trong `frontier` sẽ khiến nó không được thêm vào, ta cần đảm bảo rằng nếu có một đường đi mới rẻ hơn đến node đã có trong hàng đợi, chi phí của node đó cần được cập nhật. Điều này sẽ được giải thích rõ trong phần tiếp theo [2.3.](#23-không-đảm-bảo-cập-nhật-trọng-số-tối-ưu-trong-uniform-cost-search)
 
 ### 2.3. Không đảm bảo cập nhật trọng số tối ưu trong Uniform Cost Search 
 
