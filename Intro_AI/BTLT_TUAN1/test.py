@@ -1,7 +1,6 @@
 import random
 import math
 import queue  # Sử dụng thư viện Queue
-import pandas as pd
 
 goal_state = (0, 1, 2, 3, 4, 5, 6, 7, 8)
 
@@ -118,9 +117,9 @@ def hill_climbing_random_restart(max_restarts=10):
         result, search_cost = hill_climbing_steepest_ascent(initial_state)
         total_search_cost += search_cost
         if result:
-            # print(f"Tìm thấy lời giải sau {i} lần khởi động lại.")
+            print(f"Tìm thấy lời giải sau {i} lần khởi động lại.")
             return result, total_search_cost
-    # print("Không tìm thấy lời giải sau số lần khởi động lại tối đa.")
+    print("Không tìm thấy lời giải sau số lần khởi động lại tối đa.")
     return None, total_search_cost
 
 def simulated_annealing(initial_state, max_iterations=10000, initial_temp=1000, cooling_rate=0.003):
@@ -151,51 +150,43 @@ def simulated_annealing(initial_state, max_iterations=10000, initial_temp=1000, 
         return None, search_cost
 
 if __name__ == "__main__":
-    num_solved = {
-        "hill_climbing_steepest_ascent": 0,
-        "hill_climbing_first_choice": 0,
-        "hill_climbing_random_restart": 0,
-        "simulated_annealing": 0,
-    }
-    num_cannot_solved = {
-        "hill_climbing_steepest_ascent": 0,
-        "hill_climbing_first_choice": 0,
-        "hill_climbing_random_restart": 0,
-        "simulated_annealing": 0,
-    }
-    search_cost = {
-        "hill_climbing_steepest_ascent": [],
-        "hill_climbing_first_choice": [],
-        "hill_climbing_random_restart": [],
-        "simulated_annealing": [],
-    }
+    # Ví dụ sử dụng các thuật toán và in ra chi phí tìm kiếm
+    initial_state = generate_solvable_puzzle()
+    print("Trạng thái ban đầu:")
+    print_state(initial_state)
 
-    num_test = 1000
-    algorithms = list(num_solved.keys())
-    print("Solving 8-Puzzle problem...")
+    print("Giải bằng Hill Climbing (Steepest-Ascent):")
+    result, search_cost = hill_climbing_steepest_ascent(initial_state)
+    if result:
+        print("Tìm thấy lời giải:")
+        print_state(result)
+    else:
+        print("Không tìm thấy lời giải bằng Hill Climbing (Steepest-Ascent).")
+    print(f"Chi phí tìm kiếm: {search_cost}")
 
-    for epoch in range(num_test):
-        initial_state = generate_solvable_puzzle()
-        for algorithm in algorithms:
-            if algorithm == "hill_climbing_random_restart":
-                result, cost = hill_climbing_random_restart(max_restarts=10)
-            else:
-                result, cost = globals()[algorithm](initial_state)
-            if result:
-                num_solved[algorithm] += 1
-            else:
-                num_cannot_solved[algorithm] += 1
-            search_cost[algorithm].append(cost)
+    print("Giải bằng Hill Climbing (First-Choice):")
+    result, search_cost = hill_climbing_first_choice(initial_state)
+    if result:
+        print("Tìm thấy lời giải:")
+        print_state(result)
+    else:
+        print("Không tìm thấy lời giải bằng Hill Climbing (First-Choice).")
+    print(f"Chi phí tìm kiếm: {search_cost}")
 
-    print("Calculating results...")
-    
-    mean_search_cost = {algorithm: sum(costs) / len(costs) for algorithm, costs in search_cost.items()}
-    df = pd.DataFrame({
-        'algorithm': algorithms,
-        'num_solved': [num_solved[algo] for algo in algorithms],
-        'num_cannot_solved': [num_cannot_solved[algo] for algo in algorithms],
-        'mean_search_cost': [mean_search_cost[algo] for algo in algorithms]
-    })
-    df["percentage_of_solved"] = round(df['num_solved'] / df['num_cannot_solved'], 4)
-    df.to_csv("puzzle_results.csv")
-    print(df)
+    print("Giải bằng Hill Climbing với Khởi động lại Ngẫu nhiên:")
+    result, search_cost = hill_climbing_random_restart(max_restarts=5)
+    if result:
+        print("Tìm thấy lời giải:")
+        print_state(result)
+    else:
+        print("Không tìm thấy lời giải bằng Hill Climbing với Khởi động lại Ngẫu nhiên.")
+    print(f"Tổng chi phí tìm kiếm: {search_cost}")
+
+    print("Giải bằng Simulated Annealing:")
+    result, search_cost = simulated_annealing(initial_state)
+    if result:
+        print("Tìm thấy lời giải:")
+        print_state(result)
+    else:
+        print("Không tìm thấy lời giải bằng Simulated Annealing.")
+    print(f"Chi phí tìm kiếm: {search_cost}")
