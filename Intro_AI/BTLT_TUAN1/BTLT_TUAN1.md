@@ -300,6 +300,29 @@ Vậy ta chứng minh được $\text{A}^*$ sử dụng Tree-Search với heuris
 
 ### HOMEWORK 3
 
+Code báo cáo đã ghi rõ trong 2 file `homework3_8puzzle.py` và `homework3_8queens.py`, thầy cô có thể vào xem. Sau đây là thống kê của 4 thuật toán **hill climbing steepest-ascent**, **hill climbing first-choice variants**, **hill climbing with random restart** và **simulated annealing** sau 1000 lần tạo ra trạng thái ban đầu ngẫu nhiên có thể giải được, trong đó có:
+- số lần giải được bài toán `num_solved`.
+- số lần không giải được bài toán `num_cannot_solved`.
+- trung bình chi phí tìm kiếm `mean_search_cost`.
+- tỉ lệ thành công `percentage_of_solved`.
+
+**BÀI TOÁN 8-PUZZLE**
+
+|algorithm|num_solved|num_cannot_solved|mean_search_cost|percentage_of_solved|
+|-|-|-|-|-|
+|hill_climbing_steepest_ascent|7|993|10.761|0.007|
+|hill_climbing_first_choice|7|993|8.436|0.007|
+|hill_climbing_random_restart|21|979|103.672|0.021|
+|simulated_annealing|101|899|2976.982|0.101|
+
+**BÀI TOÁN 8-QUEENS**
+
+|algorithm|num_solved|num_cannot_solved|mean_search_cost|percentage_of_solved|
+|-|-|-|-|-|
+|hill_climbing_steepest_ascent|145|855|233.731|0.145
+|hill_climbing_first_choice|126|874|100.401|0.126
+|hill_climbing_random_restart|1000|0|1578.076|1.0
+|simulated_annealing|596|404|2834.16|0.596
 
 
 ## Câu 6: Xác định khoảng cách Manhattan $h(n)$ và sử dụng thuật toán tree-search để giải ví dụ

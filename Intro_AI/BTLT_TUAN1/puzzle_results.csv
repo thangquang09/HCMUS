@@ -1,5 +1,0 @@
-,algorithm,num_solved,num_cannot_solved,mean_search_cost,percentage_of_solved
-0,hill_climbing_steepest_ascent,1,999,10.688,0.001
-1,hill_climbing_first_choice,3,997,8.303,0.003
-2,hill_climbing_random_restart,21,979,104.538,0.0215
-3,simulated_annealing,115,885,2969.012,0.1299

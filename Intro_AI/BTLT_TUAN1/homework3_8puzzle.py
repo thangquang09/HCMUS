@@ -1,11 +1,22 @@
 import random
 import math
-import queue  # Sử dụng thư viện Queue
-import pandas as pd
+import queue
+import pandas as pd # đảm bảo rằng đã cài thư viện pandas để xuất ra thống kê đẹp hơn
 
 goal_state = (0, 1, 2, 3, 4, 5, 6, 7, 8)
 
 def is_solvable(puzzle):
+    """
+    Kiểm tra xem trạng thái 8-puzzle có thể giải được hay không.
+
+    Một trạng thái của 8-puzzle có thể giải được nếu số lượng hoán vị nghịch của nó là chẵn.
+
+    Tham số:
+    - puzzle (tuple): Trạng thái của trò chơi, biểu diễn dưới dạng tuple chứa các số từ 0 đến 8.
+
+    Trả về:
+    - bool: True nếu trạng thái có thể giải được, False nếu không.
+    """
     inversion_count = 0
     puzzle_list = [tile for tile in puzzle if tile != 0]
     for i in range(len(puzzle_list)):
@@ -15,6 +26,15 @@ def is_solvable(puzzle):
     return inversion_count % 2 == 0
 
 def generate_solvable_puzzle():
+    """
+    Sinh một trạng thái 8-puzzle ngẫu nhiên có thể giải được.
+
+    Tham số:
+    - Không có.
+
+    Trả về:
+    - puzzle (tuple): Trạng thái 8-puzzle có thể giải được.
+    """
     puzzle = list(range(9))  # Tạo danh sách từ 0 đến 8
     while True:
         random.shuffle(puzzle)  # Xáo trộn ngẫu nhiên các ô số
@@ -24,6 +44,12 @@ def generate_solvable_puzzle():
 def print_puzzle(puzzle):
     """
     In trạng thái 8-puzzle dưới dạng ma trận 3x3.
+
+    Tham số:
+    - puzzle (tuple): Trạng thái của trò chơi.
+
+    Trả về:
+    - Không có.
     """
     for i in range(0, 9, 3):
         print(puzzle[i:i+3])
@@ -32,6 +58,14 @@ def print_puzzle(puzzle):
 def manhattan_distance(state):
     """
     Tính tổng khoảng cách Manhattan của tất cả các ô số đến vị trí đích.
+
+    Khoảng cách Manhattan là tổng số bước di chuyển theo hàng và cột từ vị trí hiện tại đến vị trí đích.
+
+    Tham số:
+    - state (tuple): Trạng thái hiện tại của trò chơi.
+
+    Trả về:
+    - distance (int): Tổng khoảng cách Manhattan của tất cả các ô số.
     """
     distance = 0
     for i in range(9):
@@ -44,6 +78,12 @@ def manhattan_distance(state):
 def get_successors(state):
     """
     Tạo ra tất cả các trạng thái lân cận bằng cách di chuyển ô trống lên, xuống, trái, phải.
+
+    Tham số:
+    - state (tuple): Trạng thái hiện tại của trò chơi.
+
+    Trả về:
+    - successors (list): Danh sách các trạng thái lân cận.
     """
     successors = []
     zero_index = state.index(0)
@@ -63,6 +103,12 @@ def get_successors(state):
 def print_state(state):
     """
     In trạng thái 8-puzzle dưới dạng ma trận 3x3.
+
+    Tham số:
+    - state (tuple): Trạng thái của trò chơi.
+
+    Trả về:
+    - Không có.
     """
     for i in range(0, 9, 3):
         row = [' ' if num == 0 else str(num) for num in state[i:i+3]]
@@ -70,6 +116,25 @@ def print_state(state):
     print()
 
 def hill_climbing_steepest_ascent(initial_state):
+    """
+    Thuật toán Leo đồi (Hill Climbing) dạng Steepest-Ascent để giải bài toán 8-puzzle.
+
+    Cách hoạt động:
+    - Bắt đầu từ trạng thái ban đầu.
+    - Tại mỗi bước, xem xét tất cả các trạng thái lân cận.
+    - Chọn trạng thái lân cận có giá trị heuristic tốt nhất (khoảng cách Manhattan nhỏ nhất).
+    - Nếu không có trạng thái lân cận nào tốt hơn trạng thái hiện tại, dừng lại (mắc kẹt tại cực đại cục bộ).
+    - Nếu tìm thấy trạng thái tốt hơn, chuyển sang trạng thái đó và tiếp tục lặp lại quá trình.
+    - Tiếp tục cho đến khi tìm được lời giải (khoảng cách Manhattan bằng 0) hoặc mắc kẹt.
+
+    Tham số:
+    - initial_state (tuple): Trạng thái ban đầu của trò chơi.
+
+    Trả về:
+    - Tuple (result_state, search_cost):
+        - result_state (tuple): Trạng thái giải pháp nếu tìm thấy, hoặc None nếu không tìm thấy.
+        - search_cost (int): Chi phí tìm kiếm, tức là số lần đánh giá trạng thái.
+    """
     current = initial_state
     search_cost = 0  # Khởi tạo chi phí tìm kiếm
     while True:
@@ -86,6 +151,25 @@ def hill_climbing_steepest_ascent(initial_state):
         current = best_successor
 
 def hill_climbing_first_choice(initial_state, max_iterations=1000):
+    """
+    Thuật toán Leo đồi (Hill Climbing) dạng First-Choice để giải bài toán 8-puzzle.
+
+    Cách hoạt động:
+    - Bắt đầu từ trạng thái ban đầu.
+    - Tại mỗi bước, sinh ngẫu nhiên các trạng thái lân cận.
+    - Chọn trạng thái lân cận đầu tiên tốt hơn trạng thái hiện tại và chuyển sang trạng thái đó.
+    - Nếu không tìm thấy trạng thái lân cận tốt hơn sau khi duyệt qua các lân cận, dừng lại (mắc kẹt tại cực đại cục bộ).
+    - Tiếp tục cho đến khi tìm được lời giải (khoảng cách Manhattan bằng 0) hoặc đạt số lần lặp tối đa.
+
+    Tham số:
+    - initial_state (tuple): Trạng thái ban đầu của trò chơi.
+    - max_iterations (int): Số lần lặp tối đa (mặc định là 1000).
+
+    Trả về:
+    - Tuple (result_state, search_cost):
+        - result_state (tuple): Trạng thái giải pháp nếu tìm thấy, hoặc None nếu không tìm thấy.
+        - search_cost (int): Chi phí tìm kiếm, tức là số lần đánh giá trạng thái.
+    """
     current = initial_state
     current_score = manhattan_distance(current)
     search_cost = 0  # Khởi tạo chi phí tìm kiếm
@@ -112,6 +196,23 @@ def hill_climbing_first_choice(initial_state, max_iterations=1000):
         return None, search_cost
 
 def hill_climbing_random_restart(max_restarts=10):
+    """
+    Thuật toán Leo đồi với Khởi động lại Ngẫu nhiên để giải bài toán 8-puzzle.
+
+    Cách hoạt động:
+    - Thực hiện thuật toán Leo đồi (Steepest-Ascent) nhiều lần, mỗi lần bắt đầu từ một trạng thái ban đầu ngẫu nhiên.
+    - Giới hạn số lần khởi động lại bằng max_restarts.
+    - Nếu tìm thấy lời giải trong một lần thử, trả về lời giải đó.
+    - Nếu sau tất cả các lần khởi động lại vẫn không tìm thấy lời giải, trả về None.
+
+    Tham số:
+    - max_restarts (int): Số lần khởi động lại tối đa (mặc định là 10).
+
+    Trả về:
+    - Tuple (result_state, total_search_cost):
+        - result_state (tuple): Trạng thái giải pháp nếu tìm thấy, hoặc None nếu không tìm thấy.
+        - total_search_cost (int): Tổng chi phí tìm kiếm qua tất cả các lần khởi động lại.
+    """
     total_search_cost = 0  # Tổng chi phí tìm kiếm qua các lần khởi động lại
     for i in range(max_restarts):
         initial_state = generate_solvable_puzzle()
@@ -124,6 +225,30 @@ def hill_climbing_random_restart(max_restarts=10):
     return None, total_search_cost
 
 def simulated_annealing(initial_state, max_iterations=10000, initial_temp=1000, cooling_rate=0.003):
+    """
+    Thuật toán Simulated Annealing để giải bài toán 8-puzzle.
+
+    Cách hoạt động:
+    - Bắt đầu từ trạng thái ban đầu.
+    - Tại mỗi bước, thực hiện:
+        - Chọn ngẫu nhiên một trạng thái lân cận.
+        - Tính sự thay đổi năng lượng (delta_e) giữa trạng thái hiện tại và trạng thái mới.
+        - Nếu trạng thái mới tốt hơn (khoảng cách Manhattan giảm), chấp nhận trạng thái mới.
+        - Nếu trạng thái mới kém hơn, chấp nhận với xác suất exp(delta_e / temperature).
+    - Nhiệt độ (temperature) giảm dần sau mỗi bước theo cooling_rate.
+    - Tiếp tục cho đến khi tìm được lời giải (khoảng cách Manhattan bằng 0), đạt số lần lặp tối đa, hoặc nhiệt độ xuống thấp dưới ngưỡng cho phép.
+
+    Tham số:
+    - initial_state (tuple): Trạng thái ban đầu của trò chơi.
+    - max_iterations (int): Số lần lặp tối đa (mặc định là 10000).
+    - initial_temp (float): Nhiệt độ ban đầu (mặc định là 1000).
+    - cooling_rate (float): Tốc độ giảm nhiệt độ (mặc định là 0.003).
+
+    Trả về:
+    - Tuple (result_state, search_cost):
+        - result_state (tuple): Trạng thái giải pháp nếu tìm thấy, hoặc None nếu không tìm thấy.
+        - search_cost (int): Chi phí tìm kiếm, tức là số lần đánh giá trạng thái.
+    """
     current = initial_state
     current_score = manhattan_distance(current)
     temperature = initial_temp
@@ -172,7 +297,7 @@ if __name__ == "__main__":
 
     num_test = 1000
     algorithms = list(num_solved.keys())
-    print("Solving 8-Puzzle problem...")
+    print("Đang giải bài toán 8-Puzzle...")
 
     for epoch in range(num_test):
         initial_state = generate_solvable_puzzle()
@@ -187,8 +312,8 @@ if __name__ == "__main__":
                 num_cannot_solved[algorithm] += 1
             search_cost[algorithm].append(cost)
 
-    print("Calculating results...")
-    
+    print("Đang tính toán kết quả...")
+
     mean_search_cost = {algorithm: sum(costs) / len(costs) for algorithm, costs in search_cost.items()}
     df = pd.DataFrame({
         'algorithm': algorithms,
@@ -196,6 +321,6 @@ if __name__ == "__main__":
         'num_cannot_solved': [num_cannot_solved[algo] for algo in algorithms],
         'mean_search_cost': [mean_search_cost[algo] for algo in algorithms]
     })
-    df["percentage_of_solved"] = round(df['num_solved'] / df['num_cannot_solved'], 4)
-    df.to_csv("puzzle_results.csv")
+    df["percentage_of_solved"] = round(df['num_solved'] / num_test, 4)
+    df.to_csv("8_puzzle_results.csv", index=False)
     print(df)
