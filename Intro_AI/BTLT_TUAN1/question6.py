@@ -12,12 +12,6 @@ expected_position = {
     0: (0, 0)
 }
 
-start = [
-    [7, 2, 4],
-    [5, 0, 6],
-    [8, 3, 1]
-]
-
 goal = [
     [0, 1, 2],
     [3, 4, 5],
@@ -58,34 +52,34 @@ def move_0(state, pos_0, move):
 
 def expand(node): 
     successors = []
-    state, parent, G = node
+    state, parent, G, H_value = node  # Keep track of H(state)
     pos_0 = get_0_position(state)
     steps = [
-        (0, -1), # up
-        (0, 1),  # down
-        (-1, 0), # left
-        (1, 0)   # right
+        (0, -1), # left
+        (0, 1),  # right
+        (-1, 0), # up
+        (1, 0)   # down
     ]
 
     for step in steps:
         new_state = move_0(state, pos_0, step)
         if new_state:  # valid new state
             new_G = G + 1
-            new_F = new_G + H(new_state)
-            successors.append((new_F, (new_state, node, new_G)))
-
-
+            new_H = H(new_state)  # Calculate new H(new_state)
+            new_F = new_G + new_H
+            successors.append((new_F, (new_state, node, new_G, new_H)))  # Pass new_H as part of the tuple
     return successors
 
 def bfs(initial_state, goal_state):
     fringe = PriorityQueue()
-    fringe.put((0 + H(initial_state), (initial_state, None, 0)))  # (F, (state:mat, parent:node, G:int))
+    initial_H = H(initial_state)  # Initial H(state)
+    fringe.put((0 + initial_H, (initial_state, None, 0, initial_H)))  # (F, (state, parent, G, H))
 
     visited = set()
 
     while not fringe.empty():
         F, node = fringe.get() 
-        state, parent, G = node
+        state, parent, G, H_value = node  # Extract H(state)
 
         if is_goal(state, goal_state):
             return node 
@@ -103,32 +97,24 @@ def get_path(node):
     path = []
 
     while node:
-        state, parent, G = node
-        path.append(state)
+        state, parent, G, H_value = node  # Extract H(state) for each node
+        path.append((state, H_value))  # Append H(state) with the state
         node = parent
 
     path.reverse()
 
     for step in path:
-        for row in step:
-            print(row)
+        state, H_value = step
+        print("State:")
+        for idx, row in enumerate(state):
+            if idx == 1:
+                print(row, "  H(state)=", H_value)
+            else:
+                print(row)
         print("\n")
 
 if __name__ == "__main__":
     try:
-        goal_input = input("Input Goal? y/n (can skip, default is start from 0): ")
-        if goal_input == "y":
-            goal_state = []
-            for i in range(3):
-                row = [int(x) for x in input().split(" ")]
-                goal_state.append(row)
-        else:
-            goal_state = goal
-
-        print("Your Goal: ")
-        for row in goal_state:
-            print(row)
-        
         print("Input your initial state")
         initial_state = []
         for i in range(3):
@@ -136,10 +122,8 @@ if __name__ == "__main__":
             initial_state.append(row)
 
         print("Solving...")
-        res = bfs(initial_state, goal_state)
+        res = bfs(initial_state, goal)
         print("Path:\n")
         get_path(res)
-        print("Step: ", res[-1])
-    except Exception:
-        print("Invalid Input!")
-
+    except Exception as e:
+        print(f"Error: {e}")

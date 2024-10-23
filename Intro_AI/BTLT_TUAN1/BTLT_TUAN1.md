@@ -303,3 +303,4 @@ Vậy ta chứng minh được $\text{A}^*$ sử dụng Tree-Search với heuris
 ## Câu 6: Xác định khoảng cách Manhattan $h(n)$ và sử dụng thuật toán tree-search để giải ví dụ
 
 ![example_question6](example_question6.png)
+
