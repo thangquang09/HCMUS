@@ -19,6 +19,16 @@
     - [3.3. Space?](#33-space)
     - [3.4. Optimal?](#34-optimal)
     - [3.5. Kết luận](#35-kết-luận)
+  - [Câu 4: GREEDY BEST-FIRST SEARCH](#câu-4-greedy-best-first-search)
+    - [4.1. Complete?](#41-complete)
+    - [4.2. Time?](#42-time)
+    - [4.3. Space?](#43-space)
+    - [4.4. Optimal?](#44-optimal)
+    - [4.5. Kết luận](#45-kết-luận)
+  - [Câu 5: ADMISSIBLE HEURISTICS](#câu-5-admissible-heuristics)
+    - [HOMEWORK 2](#homework-2)
+    - [HOMEWORK 3](#homework-3)
+  - [Câu 6: Xác định khoảng cách Manhattan $h(n)$ và sử dụng thuật toán tree-search để giải ví dụ](#câu-6-xác-định-khoảng-cách-manhattan-hn-và-sử-dụng-thuật-toán-tree-search-để-giải-ví-dụ)
 
 
 ## Câu 1: BREADTH-FIRST SEARCH
@@ -206,4 +216,90 @@ DFS không tối ưu vì nó có thể tìm thấy lời giải không phải l�
 - Độ phức tạp thời gian trong trường hợp xấu nhất là $\mathcal{O}(b^m)$, có thể rất lớn nếu $m$ lớn.
 - Độ phức tạp không gian là một ưu điểm lớn với chỉ $\mathcal{O}(bm)$
 
+## Câu 4: GREEDY BEST-FIRST SEARCH
 
+### 4.1. Complete?
+
+![Romania Map](romania_map.png)
+
+Thuật toán Greedy Best-First Search không **complete** trong phiên bản tree search, ngay cả khi trong trạng thái không gian hữu hạn. Điều này có nghĩa là thuật toán GBFS có thể không tìm thấy lời giải dù lời giải đó tồn tại trong trạng thái không gian hữu hạn.
+
+Xét một ví dụ với **Romania Map** phía trên, ta sẽ dùng thuật toán GBFS tìm đường đi từ `Iasi` tới `Faragas` với hàm heuristic $h(n)$ là khoảng cách đường thẳng đến `Faragas`. Lúc này GBFS sẽ thực hiện như sau:
+- Mở rộng sang `Neamt` trước bởi vì $h(\text{Neamt})$ là nhỏ nhất, nhưng `Neamt` là ngõ cụt. 
+- Quay lại `Iasi`: lúc này $h(\text{Iasi})$ nhỏ hơn các lựa chọn khác nên lại được thêm vào **frontier**.
+- Vòng lặp vô hạn: Nó sẽ lặp lại bước 1 và bước 2 mà không thể tìm đến được `Faragas`, vì đây là phiên bản tree search.
+
+Greedy Best-First Search phiên bản graph search sẽ **complete** trong không gian trạng thái hữu hạn, vì nó tránh được việc mở rộng lại các nút đã được thăm.
+
+### 4.2. Time?
+
+Độ phức tạp thời gian của GBFS phụ thuộc vào chất lượng của hàm heuristic $h(n)$. Từ đó trường hợp xấu nhất là $\mathcal{O}(b^m)$ với $b$ là hệ số phân tán, $m$ là độ sâu tối đa của không gian trạng thái. Nếu hàm heuristic tốt, GBFS sẽ nhanh chóng tìm ra lời giải, mở rộng ít nút hơn.
+
+Trích từ sách **AI Russel Norvig trang 93**
+>The worst-case time and space complexity for the tree version is $O(b^m)$, where $m$ is the maximum depth of the search space. With a good heuristic function, however, the complexity can be reduced substantially.
+
+### 4.3. Space?
+
+Độ phức tạp không gian của GBFS là $\mathcal{O}(b^m)$ bởi vì **frontier** lưu trữ tất cả các nút đã được tạo ra với sự ưu tiên dựa trên $h(n)$. Nếu heuristic tốt nó có thể giảm được số lượng nút cần lưu trữ.
+
+### 4.4. Optimal?
+
+GBFS không **optimal**, nó không đảm bảo tìm được đường đi ngắn nhất bởi vì chỉ dựa trên $h(n)$, không xem xét chi phí từ nút gốc đến nút hiện tại. Ta xét một ví dụ cũng từ bản đồ trên, tìm đường đi từ `Arad` tới `Bucharest`:
+
+Dựa vào hàm heuristic là $h(n)$ là khoảng cách đường thẳng. GBFS sẽ chọn đường đi như sau: `Arad` $\to$ `Sibiu` $\to$ `Faragas` $\to$ `Bucharest` với chi phí là $140+99+211=450$ trong khi đường đi tối ưu là `Arad` $\to$ `Sibiu` $\to$ `Rimnicu Vilcea` $\to$ `Pitesti` $\to$ `Bucharest` với chi phí là $140+80+97+101=418$
+
+### 4.5. Kết luận
+
+- GBFS không **complete** trong tìm kiếm trên cây, **complete** trong tìm kiếm trên đồ thị hữu hạn.
+- Độ phức tạp thời gian $\mathcal{O}(b^m)$, nhưng có thể cải thiện với heuristic tốt.
+- Độ phức tạp không gian $\mathcal{O}(b^m)$, phụ thuộc vào số nút trong **frontier**.
+- GBFS không **optimal**, không đảm bảo tìm được đường đi có chi phí thấp nhất.
+
+## Câu 5: ADMISSIBLE HEURISTICS
+
+### HOMEWORK 2
+
+Chứng minh định lý sau:
+
+>**Định lý:** Nếu $h(n)$ là admissible, $\text{A}^*$ sử dụng Tree-Search là tối ưu (optimal).
+
+Ta có định nghĩa của admissible heuristics:
+
+> **Định nghĩa:** Hàm heuristic $h(n)$ được gọi là admissible nếu với mọi nút $n$, $h(n) \leq h^*(n)$, trong đó $h^*(n)$ là chi phí thực tế thấp nhất từ $n$ đến nút đích.
+
+Gọi $C^*$ là chi phí của lời giải tối ưu từ nút bắt đầu tới nút đích. 
+
+Giả sử có một nút đích không tối ưu (suboptimal goal) G2 nằm trong **fringe**, ta chứng minh rằng $f(\text{G2}) > C^*$.
+- Vì G2 là một lời giải không tối ưu, nên chi phí thực tế của nó $g(\text{G2}) > C^*$
+- Vì G2 là một nút đích, nên $h(G2)=0$
+- Từ đó ta có $f(\text{G2}) = g(\text{G2}) + h(\text{G2}) = g(\text{G2}) + 0 = g(\text{G2})$
+
+Vậy $$\begin{equation} f(\text{G2}) > C^* \end{equation}$$
+
+Xét một nút $n$ nằm trên đường đi tối ưu và ở trong **fringe**, ta chứng minh rằng $f(n) \leq C^*$
+- Vì $n$ nằm trên đường đi tối ưu, nên tổng chi phí từ nút bắt đầu qua $n$ xong tới đích là $C^*$
+- Chi phí từ nút bắt đầu tới $n$ là $g(n)$
+- Chi phí thực tế từ $n$ đến đích là $h^*(n)$, theo định nghĩa thì $g(n)+h^*(n) = C^*$
+- Vì $h(n)$ là admissible, nên $h(n) \leq h^*(n)$
+- Từ đó ta có $f(n) = g(n) + h(n) \leq g(n) + h^*(n) = C^*$
+
+Vậy $$\begin{equation} f(\text{n}) \leq C^* \end{equation}$$
+
+Từ $(1)$ và $(2)$ ta có được 
+$$
+\begin{equation}
+f(n) \leq C^* < f(G2)
+\end{equation}
+$$
+
+Điều này có nghĩa là mọi nút $n$ trên đường đi tối ưu sẽ có giá trị $f(n)$ nhỏ hơn $f(\text{G2})$. Mà thuật toán $\text{A}^*$ luôn mở rộng nút tong **fringe** có giá trị $f(n)$ nhỏ nhất, kết hợp với $(3)$ nên $\text{A}^*$ luôn mở rộng các nút nằm trên đường đi tối ưu trước khi G2 được xem xét.
+
+Từ đó $\text{A}^*$ sẽ tìm thấy lời giải tối ưu với chi phí $C^*$ trước khi mở rộng bất kỳ nút đích không tối ưu nào.
+
+Vậy ta chứng minh được $\text{A}^*$ sử dụng Tree-Search với heuristic admissible được sẽ luôn tìm được lời giải tối ưu.
+
+### HOMEWORK 3
+
+## Câu 6: Xác định khoảng cách Manhattan $h(n)$ và sử dụng thuật toán tree-search để giải ví dụ
+
+![example_question6](example_question6.png)
