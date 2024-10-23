@@ -114,7 +114,7 @@ detected and the time complexity would be $\mathcal{O}(b^{d+1})$.
 
 ### 1.4. Optimal?
 
-Thuật toán BFS sẽ được coi là **tối ưu (optimal)** nếu hàm chi phí đường đi tới các nút không giảm theo độ sâu, trường hợp phổ biến là chúng là hằng số, nghĩa là chi phí từ nút $i$ đến nút $j$ là bằng nhau với mọi nút $i,j$ trong đồ thị.
+Thuật toán BFS sẽ được coi là **tối ưu (optimal)** nếu hàm chi phí đường đi tới các nút không giảm theo độ sâu, trường hợp phổ biến là mọi bước đi từ đỉnh này tới đỉnh kề với nó là bằng nhau, nghĩa là chi phí bước đi từ nút $i$ đến nút $j$ là bằng nhau với mọi nút $i,j$ kề nhau trong đồ thị.
 
 BFS tối ưu trong trường hợp này là vì: nó khám phá tất cả các đường đi có độ dài ngắn trước khi xem xét các đường đi dài hơn. Do đó khi tìm thấy nút mục tiêu, thì đó là **đường đi có số bước ít nhất**, và nếu chi phí là như nhau thì còn được gọi là **đường đi có chi phí ít nhất**.
 
