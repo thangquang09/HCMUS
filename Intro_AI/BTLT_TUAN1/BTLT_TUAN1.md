@@ -300,7 +300,149 @@ Vậy ta chứng minh được $\text{A}^*$ sử dụng Tree-Search với heuris
 
 ### HOMEWORK 3
 
+
+
 ## Câu 6: Xác định khoảng cách Manhattan $h(n)$ và sử dụng thuật toán tree-search để giải ví dụ
 
 ![example_question6](example_question6.png)
 
+Với mỗi trạng thái `state` gọi H(state) là khoảng cách Manhattan sau đây là sử dụng A* tree-search để giải bài toán 8-puzzle này:
+
+```
+State:
+[7, 2, 4]
+[5, 0, 6]   H(state)= 18
+[8, 3, 1]
+
+State:
+[7, 2, 4]
+[0, 5, 6]   H(state)= 17
+[8, 3, 1]
+
+State:
+[0, 2, 4]
+[7, 5, 6]   H(state)= 16
+[8, 3, 1]
+
+State:
+[2, 0, 4]
+[7, 5, 6]   H(state)= 17
+[8, 3, 1]
+
+State:
+[2, 5, 4]
+[7, 0, 6]   H(state)= 18
+[8, 3, 1]
+
+State:
+[2, 5, 4]
+[7, 6, 0]   H(state)= 17
+[8, 3, 1]
+
+State:
+[2, 5, 4]
+[7, 6, 1]   H(state)= 16
+[8, 3, 0]
+
+State:
+[2, 5, 4]
+[7, 6, 1]   H(state)= 17
+[8, 0, 3]
+
+State:
+[2, 5, 4]
+[7, 6, 1]   H(state)= 16
+[0, 8, 3]
+
+State:
+[2, 5, 4]
+[0, 6, 1]   H(state)= 15
+[7, 8, 3]
+
+State:
+[2, 5, 4]
+[6, 0, 1]   H(state)= 14
+[7, 8, 3]
+
+State:
+[2, 5, 4]
+[6, 1, 0]   H(state)= 13
+[7, 8, 3]
+
+State:
+[2, 5, 4]
+[6, 1, 3]   H(state)= 12
+[7, 8, 0]
+
+State:
+[2, 5, 4]
+[6, 1, 3]   H(state)= 11
+[7, 0, 8]
+
+State:
+[2, 5, 4]
+[6, 1, 3]   H(state)= 10
+[0, 7, 8]
+
+State:
+[2, 5, 4]
+[0, 1, 3]   H(state)= 9
+[6, 7, 8]
+
+State:
+[2, 5, 4]
+[1, 0, 3]   H(state)= 10
+[6, 7, 8]
+
+State:
+[2, 5, 4]
+[1, 3, 0]   H(state)= 9
+[6, 7, 8]
+
+State:
+[2, 5, 0]
+[1, 3, 4]   H(state)= 8
+[6, 7, 8]
+
+State:
+[2, 0, 5]
+[1, 3, 4]   H(state)= 7
+[6, 7, 8]
+
+State:
+[0, 2, 5]
+[1, 3, 4]   H(state)= 6
+[6, 7, 8]
+
+State:
+[1, 2, 5]
+[0, 3, 4]   H(state)= 5
+[6, 7, 8]
+
+State:
+[1, 2, 5]
+[3, 0, 4]   H(state)= 4
+[6, 7, 8]
+
+State:
+[1, 2, 5]
+[3, 4, 0]   H(state)= 3
+[6, 7, 8]
+
+State:
+[1, 2, 0]
+[3, 4, 5]   H(state)= 2
+[6, 7, 8]
+
+State:
+[1, 0, 2]
+[3, 4, 5]   H(state)= 1
+[6, 7, 8]
+
+State:
+[0, 1, 2]
+[3, 4, 5]   H(state)= 0
+[6, 7, 8]
+```
+
+Tổng cộng mất 26 bước đi.

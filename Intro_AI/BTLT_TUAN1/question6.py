@@ -23,6 +23,9 @@ def H(node):
     for i in range(3):
         for j in range(3):
             val = node[i][j]
+            if val == 0:
+                # không tính vị trí của ô trống
+                continue 
             point_x, point_y = expected_position[val]
             manhattan_distance = abs(i - point_x) + abs(j - point_y)
             total += manhattan_distance
@@ -111,7 +114,7 @@ def get_path(node):
                 print(row, "  H(state)=", H_value)
             else:
                 print(row)
-        print("\n")
+        print()
 
 if __name__ == "__main__":
     try:
