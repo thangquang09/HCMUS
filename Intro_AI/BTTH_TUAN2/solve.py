@@ -200,6 +200,8 @@ class Solution():
             elif self.is_goal_state(number_missionaries, number_cannibals, side):
                 v.set_style("filled")
                 v.set_fillcolor("green")
+                ## ---- Gán self.solved = True ----
+                self.solved = True
                 return True
             elif self.number_of_cannibals_exceeds(number_missionaries, number_cannibals):
                 v.set_style("filled")
