@@ -1,0 +1,181 @@
+library(tidyverse)
+library(boot)
+library(ggplot2)
+
+# ---- Load data ----
+data_adv <- read.csv(file = "datasets/Advertising.csv")
+data_adv <- data_adv |> janitor::clean_names()
+glimpse(data_adv)
+
+# ---- Linear Model ----
+md_adv <- lm(sales ~ tv + radio + newspaper, data=data_adv)
+summary(md_adv)
+
+# ---- Explain ----
+
+# Một số nhận xét nhanh:
+#   • Tăng chi phí quảng cáo TV lên một đơn vị (1000$), doanh số bán hàng tăng 45.8 đơn vị sản phẩm.
+# • Nếu xét theo chi phí quảng cáo trên Radio, mức tăng doanh số khi tăng chi phí quảng cáo lên một đơn
+# vị (1000$) là 188.5 đơn vị sản phẩm.
+# • Trong khi đó, tăng 1000$ cho chi phí quảng cáo trên báo in thì mức tăng doanh số bán hàng lại là −1
+# đơn vị sản phẩm! Tại sao lại như vậy? Theo biểu đồ tương quan, mức tăng phải dương.
+# Tiếp theo, ta áp dụng phương pháp bootstrap để ước lượng khoảng tin cậy và kiểm định giả thuyết βj = 0.
+
+# ---- Kiem dinh gia thuyet ----
+fun_boot_md <- function(data, ind, formula, ...){
+  data_new <- data[ind,]
+  out_md <- lm(formula = formula, data = data_new, ...)
+  return(out_md$coefficients)
+}
+
+set.seed(84)
+out_boot_md_adv <- boot(data = data_adv, statistic = fun_boot_md, R = 1000,
+                        formula = sales ~ tv + radio + newspaper)
+out_boot_md_adv
+
+idx1_boot <- boot.ci(out_boot_md_adv, index=1, type = "perc", conf = 0.95)
+idx2_boot <- boot.ci(out_boot_md_adv, index = 2, type = "perc", conf = 0.95)
+idx3_boot <- boot.ci(out_boot_md_adv, index = 3, type = "perc", conf = 0.95)
+idx4_boot <- boot.ci(out_boot_md_adv, index = 4, type = "perc", conf = 0.95)
+
+bootstrap_estimates_idx1 <- out_boot_md_adv$t[, 1]
+bootstrap_estimates_idx2 <- out_boot_md_adv$t[, 2]
+bootstrap_estimates_idx3 <- out_boot_md_adv$t[, 3]
+bootstrap_estimates_idx4 <- out_boot_md_adv$t[, 4]
+
+# Convert to a data frame for ggplot2
+bootstrap_df_idx1 <- data.frame(estimate = bootstrap_estimates_idx1)
+bootstrap_df_idx2 <- data.frame(estimate = bootstrap_estimates_idx2)
+bootstrap_df_idx3 <- data.frame(estimate = bootstrap_estimates_idx3)
+bootstrap_df_idx4 <- data.frame(estimate = bootstrap_estimates_idx4)
+
+# Plot the histogram
+ggplot(data=data.frame(t=out_boot_md_adv$t), mapping=aes(x=out_boot_md_adv$t[, 1])) + 
+  geom_histogram(fill = "gray80", color="black", bins=20) +
+  geom_vline(xintercept = out_boot_md_adv$t0[1], color = "blue", linetype="dashed") +
+  xlab("bootstrap for beta1") + ylab("Frequency") + theme_bw()
+
+ggplot(data=data.frame(t=out_boot_md_adv$t), mapping=aes(x=out_boot_md_adv$t[, 2])) + 
+  geom_histogram(fill = "gray80", color="black", bins=20) +
+  geom_vline(xintercept = out_boot_md_adv$t0[2], color = "blue", linetype="dashed") +
+  xlab("bootstrap for beta2") + ylab("Frequency") + theme_bw()
+
+ggplot(data=data.frame(t=out_boot_md_adv$t), mapping=aes(x=out_boot_md_adv$t[, 3])) + 
+  geom_histogram(fill = "gray80", color="black", bins=20) +
+  geom_vline(xintercept = out_boot_md_adv$t0[3], color = "blue", linetype="dashed") +
+  xlab("bootstrap for beta3") + ylab("Frequency") + theme_bw()
+
+ggplot(data=data.frame(t=out_boot_md_adv$t), mapping=aes(x=out_boot_md_adv$t[, 4])) + 
+  geom_histogram(fill = "gray80", color="black", bins=20) +
+  geom_vline(xintercept = out_boot_md_adv$t0[4], color = "blue", linetype="dashed") +
+  xlab("bootstrap for beta4") + ylab("Frequency") + theme_bw()
+
+# Kiểm định giả thuyết Bj = 0
+
+pvals_adv2 <- sapply(1:ncol(out_boot_md_adv$t),function(x) {
+  qt0 <- mean(out_boot_md_adv$t[, x] <= 0)
+  if (qt0 < 0.5) {
+    return(2*qt0)
+  } else {
+    return(2*(1 - qt0))
+  }
+})
+pvals_adv2
+
+# ---- Predict data ----
+# Giả sử ta có thông tin rằng, công ty sẽ đầu tư 150.000$, 40.000$ và 55.000$ cho quảng cáo lần lượt trên trên
+# tivi, radio và newspaper. Khi đó, dựa vào mô hình, ta có thể ước tính được trung bình doanh số bán hàng là
+
+predict(md_adv, newdata = data.frame(tv=150, radio=40, newspaper=55))
+
+# ---- Tim khoang tin cay cho doanh so ban hang trung binh ----
+
+x_adv <- c(1, 150, 40, 55)
+y_adv <- apply(out_boot_md_adv$t, 1, function(x) {
+  x_adv %*% x
+})
+quantile(y_adv, probs=c(0.025, 0.975))
+
+# Sử dụng bootrap để ước lượng khoảng tiên đoán cho  doanh số sản phẩm 
+
+resis_adv <- residuals(md_adv)
+y_adv_pd_pci <- y_adv + sample(resis_adv, size=1000, replace=TRUE)
+quantile(y_adv_pd_pci, probs=c(0.025, 0.975))
+
+# ---- Danh gia mo hinh ----
+# ---- Validation ----
+RMSE <- function(y_real, y_pred) {
+  if (length(y_real) != length(y_pred)) {
+    stop("Invalid Input: Length of y_real and y_pred must be equal.")
+  }
+  sqrt(mean((y_real - y_pred)^2))
+}
+
+train_test_split <- function(data, train_ratio = 0.7) {
+  train_indices <- sample(seq_len(nrow(data)), size = floor(train_ratio * nrow(data)), replace = FALSE)
+  train_data <- data[train_indices, ]
+  test_data <- data[-train_indices, ]
+  res <- list(
+    train_data = train_data,
+    test_data = test_data
+  )
+  return(res)
+}
+
+splited_data <- train_test_split(data_adv, train_ratio = 0.8)
+
+train_data <- splited_data$train_data
+test_data <- splited_data$test_data
+new_lr <- lm(data = train_data, formula = sales ~ tv + radio + newspaper)
+summary(new_lr)
+
+# predict
+set.seed(42)
+y_pred <- predict(new_lr, newdata = test_data)
+
+# Lấy phần dư từ mô hình
+residuals_new_lr <- residuals(new_lr)
+
+# Thêm phần dư vào giá trị dự đoán
+y_pred_with_residuals <- y_pred + sample(residuals_new_lr, size = length(y_pred), replace = TRUE)
+
+# Tính RMSE
+rmse_value <- RMSE(test_data$sales, y_pred_with_residuals)
+print(rmse_value)
+# ---- Cross Valid ----
+
+# Hàm thực hiện LOOCV
+loocv <- function(data, formula) {
+  n <- nrow(data)
+  errors <- numeric(n)
+  
+  for (i in 1:n) {
+    # Tạo tập huấn luyện và tập kiểm tra
+    train_data <- data[-i, ]
+    test_data <- data[i, , drop = FALSE]
+    
+    # Huấn luyện mô hình trên tập huấn luyện
+    model <- lm(formula, data = train_data)
+    
+    # Dự đoán giá trị cho tập kiểm tra
+    prediction <- predict(model, newdata = test_data)
+    
+    # Tính lỗi dự đoán
+    errors[i] <- (test_data$sales - prediction)^2
+  }
+  
+  # Tính RMSE từ các lỗi dự đoán
+  rmse <- sqrt(mean(errors))
+  return(rmse)
+}
+
+# Sử dụng hàm LOOCV với dữ liệu của bạn
+set.seed(123)
+data <- data_adv  # Thay thế bằng dữ liệu của bạn
+formula <- sales ~ tv + radio + newspaper
+
+loocv_rmse <- loocv(data, formula)
+print(loocv_rmse)
+
+
+
