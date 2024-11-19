@@ -1,0 +1,36 @@
+```{r}
+library(tidyverse)
+library(leaps)
+
+data(Hitters, package = "ISLR2")
+Hitters <- Hitters |> janitor::clean_names()
+glimpse(Hitters)
+```
+
+```{r}
+sum(is.na(Hitters$salary))
+```
+
+```{r}
+Hitters <- na.omit(Hitters)
+glimpse(Hitters)
+```
+
+```{r}
+out_subset_hitters <- regsubsets(x=salary~., data=Hitters, nvmax=8, method="exhaustive")
+summary(out_subset_hitters)
+```
+
+```{r}
+sum_out_subset_hitters <- summary(out_subset_hitters)
+sum_out_subset_hitters$cp
+```
+
+```{r}
+sum_out_subset_hitters$which[which.min(sum_out_subset_hitters$cp), ]
+```
+
+```{r}
+coef(out_subset_hitters, which.min(sum_out_subset_hitters$cp))
+```
+
