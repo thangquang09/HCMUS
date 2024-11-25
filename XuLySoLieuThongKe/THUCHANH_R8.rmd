@@ -1,0 +1,63 @@
+```{r}
+library(tidyverse)
+library(VIM)
+
+aida <- read.csv(file="datasets/AIDA_expamle.csv")
+aida <- aida |> janitor::clean_names()
+glimpse(aida)
+```
+```{r}
+aggr(aida, ylab = c("Proportion of missings", "Pattern"), number=TRUE, cex.axis=0.6, cex.numbers=0.5)
+```
+
+- Biểu đồ đầu tiên cho thấy số lượng % bị khuyết của biến trong dữ liệu
+- Biều đồ thứ hai cho biết về xu hướng khuyết của dữ liệu
+
+```{r}
+marginplot(aida[, c("p_l_o", "cl_ta")], pch=c(18, 16))
+```
+- Biểu đồ quan sát khả năng khuyết của từng cặp biến
+- Thấy được biểu đồ hộp là không trùng khớp nhau  -> cơ chết khuyết dữ liệu của 2 biến trên không thể là MCAR
+
+Làm tương tự cho employees:
+```{r}
+marginplot(aida[, c("p_l_o", "employees")], pch=c(18, 20))
+```
+
+Tiếp tục với roi
+```{r}
+marginplot(aida[, c("p_l_o", "roi")], pch = c(18, 16))
+```
+
+2. Xu ly du lieu khuyet
+
+2.1 Xoa toan bo du lieu na
+Cu phap: na.omit(data)
+
+```{R}
+aida_cc <- na.omit(aida)
+glimpse(aida_cc)
+```
+
+2.2 Xu ly MAR
+
+Cu phap: mice(data, m, method, printFlag = TRUE)
+method: (pmm, norm, logreg, polyreg, polr)
+
+```{r}
+library(mice)
+aida_numeric <- aida |> select(!c("cid", "province"))
+
+imp_aida <- mice(aida_numeric, method='pmm', m = 6, printFlag=TRUE)
+```
+```{r}
+imp_aida
+```
+```{r}
+stripplot(imp_aida)
+```
+
+
+
+
+

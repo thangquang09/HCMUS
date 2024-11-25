@@ -201,18 +201,22 @@ def search(graph, start, goal, func):
                 queue.put((new_cost, i))
     return node
 
+
 def bfs(graph, start, goal):
     visited = set()
     queue = Queue()
 
     queue.put(start)
-    visited.add(start)
     start.pre = None
 
     while True:
         if queue.empty():
             raise Exception('No way Exception')
         current_node = queue.get()
+
+        if current_node in visited:
+            continue
+
         visited.add(current_node)
 
         if current_node == goal:
@@ -223,18 +227,23 @@ def bfs(graph, start, goal):
                 queue.put(node)
                 node.pre = current_node
 
+    return None # không tìm thấy đường đi
+
 def dfs(graph, start, goal):
     visited = set()
     stack = []
 
     stack.append(start)
-    visited.add(start)
     start.pre = None
 
     while True:
         if stack == []:
             raise Exception('No way Exception')
         current_node = stack.pop()
+
+        if current_node in visited:
+            continue
+        
         visited.add(current_node)
 
         if current_node == goal:
@@ -244,26 +253,36 @@ def dfs(graph, start, goal):
             if node not in visited and node not in stack:
                 stack.append(node)
                 node.pre = current_node
+        
+    return None # không tìm thấy đường đi
 
 def ucs(graph, start, goal):
     visited = set()
     queue = PriorityQueue()
 
     queue.put((0, start))
-    visited.add(start)
 
-    while True:
-        cost, current_node = queue.get()
+    cost = {start: 0}
+
+    while not queue.empty():
+        current_cost, current_node = queue.get()
+        
+        if current_node in visited:
+            continue
+
         visited.add(current_node)
 
         if current_node == goal:
             return current_node
+
         for node in graph.can_see(current_node):
-            new_cost = current_node.g + euclid_distance(current_node, node)
-            if node not in visited or new_cost < node.g:
+            new_cost = cost[current_node] + euclid_distance(current_node, node)
+            if node not in cost or new_cost < cost[node]:
+                cost[node] = new_cost
                 queue.put((new_cost, node))
-                node.g = new_cost
                 node.pre = current_node
+    
+    return None # không tìm thấy đường đi
 
 a_star = lambda graph, i: i.g + graph.h(i) 
 greedy = lambda graph, i: graph.h(i)
@@ -293,11 +312,12 @@ def main():
         graph = Graph(poly_list)
         graph.heuristic = {point: point.heuristic(goal) for point in graph.get_points()}
 
+        # a = search(graph, start, goal, a_star)
         # a = search(graph, start, goal, greedy)
-        a = ucs(graph, start, goal)
-        # a = dfs(graph, start, goal)
         # a = bfs(graph, start, goal)
-
+        # a = dfs(graph, start, goal)
+        a = ucs(graph, start, goal)
+        
         result = list()
 
         while a:
