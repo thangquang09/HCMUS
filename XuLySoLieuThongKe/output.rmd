@@ -1,0 +1,472 @@
+
+```{r}
+library(tidyverse)
+library(boot)
+library(ggplot2)
+library(gridExtra) # multi plot
+library(ipred) # CV k fold
+library(car) # for VIF
+
+data = read.csv("output.csv")
+data <- data |> janitor::clean_names()
+glimpse(data)
+```
+
+
+```{r}
+data <- data |> drop_na(health_score)
+glimpse(data)
+```
+
+## Ước lượng mô hình
+
+```{r}
+linear_model <- lm(formula=health_score ~ ., data=data)
+print(summary(linear_model))
+```
+
+Nhận xét nhanh:
+- Cứ tăng `age` lên 10 đơn vị thì là `heath_score` giảm khoảng 2.3 
+- Cứ tăng `bmi` lên 10 đơn vị thì `heath_score` giảm khoảng 11.3
+- Cứ tăng `diet_quality` lên 10 đơn vị thì `heath_score` tăng khoảng 6.1
+- Cứ tăng `sleep_hours` lên 10 đơn vị thì `heath_score` tăng khoảng 24.2
+- Cứ tăng `alcohol_consumption` lên 10 đơn vị thì `heath_score` giảm khoảng 9.3
+
+## Áp dụng bootstrap 
+
+Để ước lượng khoảng tin cậy và kiểm định giả thuyết $\beta_j=0$, đầu tiên là hàm `fun_boot_md()` để thực hiện ước tính mỗi lần lặp lấy mẫu 
+
+```{r}
+fun_boot_md <- function(data, ind, formula) {
+    data_new <- data[ind,]
+    out_md <- lm(formula = formula, data = data_new)
+    return(out_md$coefficients)
+}
+```
+
+
+```{r}
+set.seed(42)
+out_boot <- boot(data = data, statistic = fun_boot_md, R = 1000, formula = health_score ~ .)
+out_boot
+```
+
+Ước lượng khoảng tin cậy bootstrap và vẽ histogram để xem kết quả
+
+```{r}
+ci_histogram_plot <- function(out_boot, index, conf) {
+    ci <- boot.ci(out_boot, index=index, type="perc", conf=conf)
+    plot <- ggplot(data=data.frame(t=out_boot$t[, index]), mapping=aes(x=t)) + 
+    geom_histogram(fill = "gray80", color="black", bins=20) +
+    geom_vline(xintercept = out_boot$t0[index], color = "blue", linetype="dashed") +
+    xlab("Bootstrap Estimates of Coefficients") + ylab("Frequency") + theme_bw()
+    print(ci)
+    return(plot)
+}
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=1, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=2, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=3, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=4, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=5, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=6, conf = 0.05)
+```
+
+
+```{r}
+ci_histogram_plot(out_boot = out_boot, index=7, conf = 0.05)
+```
+
+Tính p-value cho kiểm định giả thuyết $\beta_j = 0$
+
+```{r}
+pvals_data <- sapply(1:ncol(out_boot$t), function(x) {
+    qt0 <- mean(out_boot$t[, x] <= 0)
+    if (qt0 < 0.5) {
+        return(2 * qt0)
+    } else {
+        return(2 * (1 - qt0))
+    }
+})
+pvals_data_value <- data.frame(P_Value=pvals_data)
+print(pvals_data_value)
+```
+
+Ta thấy được tất cả p-value của các biến trong mô hình đều bằng 0, với mức ý nghĩa 5% vậy ta có thể bác bỏ được giả thuyết các $\beta_j=0$ vậy nghĩa là tất cả các biến đều có mối quan hệ có ý nghĩa thống kê với biến phụ thuộc `heath_score` 
+Thử predict giá trị cho đầu ra
+
+```{r}
+print(predict(linear_model, newdata= data.frame(age=40, bmi=29, exercise_frequency=3, diet_quality=41, sleep_hours=7, smoking_status=0, alcohol_consumption=3)))
+```
+
+
+```{r}
+# Predict the health_score for the given new data
+predicted_value <- predict(linear_model, newdata= data.frame(age=40, bmi=29, exercise_frequency=3, diet_quality=41, sleep_hours=7, smoking_status=0, alcohol_consumption=3))
+print(predicted_value)
+# Function to predict health_score for new data using bootstrap samples
+predict_bootstrap <- function(linear_model, newdata, R = 1000) {
+    bootstrap_preds <- numeric(R)
+    for (i in 1:R) {
+        sample_indices <- sample(1:nrow(data), replace = TRUE)
+        bootstrap_sample <- data[sample_indices, ]
+        bootstrap_model <- lm(formula = health_score ~ ., data = bootstrap_sample)
+        bootstrap_preds[i] <- predict(bootstrap_model, newdata = newdata)
+    }
+    return(bootstrap_preds)
+}
+
+# Predict health_score for new data using bootstrap
+set.seed(42)
+bootstrap_predictions <- predict_bootstrap(linear_model, newdata = data.frame(age=40, bmi=29, exercise_frequency=3, diet_quality=41, sleep_hours=7, smoking_status=0, alcohol_consumption=3))
+
+# Calculate confidence interval
+ci <- quantile(bootstrap_predictions, probs = c(0.025, 0.975))
+print(ci)
+```
+
+
+```{r}
+resid <- residuals(linear_model)
+y_data_pd_pci <- bootstrap_predictions + sample(resid, size = 1000, replace = TRUE)
+print(quantile(y_data_pd_pci, probs = c(0.025, 0.975)))
+```
+
+## Đánh giá mô hình
+
+- Sử dụng công thức $\displaystyle\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i-\hat{y}_i)^2}$ 
+- Sử dụng các phương pháp cross-validation
+
+```{r}
+RMSE <- function(y_real, y_pred) {
+  if (length(y_real) != length(y_pred)) {
+    stop("Invalid Input: Length of y_real and y_pred must be equal.")
+  }
+  sqrt(mean((y_real - y_pred)^2))
+}
+```
+
+Đầu tiên là phương pháp train test split (theo tỷ lệ `5-5`, `6-4`, `7-3`)
+
+```{r}
+train_test_split <- function(data, train_ratio = 0.7) {
+  train_indices <- sample(seq_len(nrow(data)), size = floor(train_ratio * nrow(data)), replace = FALSE)
+  train_data <- data[train_indices, ]
+  test_data <- data[-train_indices, ]
+  res <- list(
+    train_data = train_data,
+    test_data = test_data
+  )
+  return(res)
+}
+
+RMSE_train_ratio <- function(data, formula, train_ratio = 0.8) {
+  splited_data <- train_test_split(data, train_ratio = train_ratio)
+  train_data <- splited_data$train_data
+  test_data <- splited_data$test_data
+  new_lr <- lm(data = train_data, formula = formula)
+  
+  # predict
+  set.seed(42)
+  y_pred <- predict(new_lr, newdata = test_data)
+  
+  # calculate residuals
+  residuals_new_lr <- residuals(new_lr)
+  
+  # Add residuals to predict
+  y_pred_with_residuals <- y_pred + sample(residuals_new_lr, size = length(y_pred), replace = TRUE)
+  
+  # Calculate RMSE
+  rmse_value <- RMSE(test_data$health_score, y_pred_with_residuals) # chỉnh biến mục tiêu ở đây
+  return(rmse_value)
+}
+```
+
+
+```{r}
+traintest = train_test_split(data, train_ratio = 0.5)
+train = traintest$train
+test = traintest$test
+```
+
+
+```{r}
+# 5-5 train test split
+RMSE_train_ratio(data, formula=health_score ~ ., train_ratio = 0.5)
+```
+
+
+```{r}
+# 6-4 train test split
+RMSE_train_ratio(data, formula=health_score ~ ., train_ratio = 0.6)
+```
+
+
+```{r}
+# 7-3 train test split
+RMSE_train_ratio(data, formula=health_score ~ ., train_ratio = 0.7)
+```
+
+Cross Leave One Out
+
+```{r}
+loocv <- function(data, formula) {
+    n <- nrow(data)
+    y_real <- numeric(n)
+    y_pred <- numeric(n)
+    
+    for (i in 1:n) {
+        train_data <- data[-i, ]
+        test_data <- data[i, , drop = FALSE]
+        
+        model <- lm(formula, data = train_data)
+        
+        prediction <- predict(model, newdata = test_data)
+        
+        y_real[i] <- test_data$health_score # chỉnh biến mục tiêu ở đây
+        y_pred[i] <- prediction
+    }
+    
+    rmse <- RMSE(y_real, y_pred)
+    return(rmse)
+}
+```
+
+
+```{r}
+loocv(data=data, formula = health_score ~ .)
+```
+
+Cross-validation (k-Fold), ta Cross với $k=10$
+
+```{r}
+# Apply errorest function for 10-fold cross-validation
+cv_error <- errorest(formula = health_score ~ ., data = data, model = lm, est.para = control.errorest(k = 10))
+print(cv_error)
+```
+
+## Chuẩn đoán mô hình
+
+Ta plot lên biểu đồ Residual và Fitted
+
+```{r}
+ggplot(data = linear_model, mapping = aes(x = .fitted, y = .resid)) +
+    geom_point() +
+    geom_smooth(method = "loess", se = FALSE) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "Fitted values", y = "Residuals") +
+    theme_bw()
+```
+
+Hình vẽ cho thấy một xu hướng đường cong rõ ràng, giả định về tính tuyến tính của mô hình là không phù hợp
+
+```{r}
+# Fit the model with interaction between tv and radio
+model_interaction <- lm(health_score ~ age*bmi + exercise_frequency + diet_quality + sleep_hours + smoking_status + alcohol_consumption, 
+        data = data) # chỉnh công thức
+
+# Plot Residuals vs Fitted values
+ggplot(data = model_interaction, mapping = aes(x = .fitted, y = .resid)) +
+    geom_point() +
+    geom_smooth(method = "loess", se = FALSE) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "Fitted values", y = "Residuals", title = "Residuals vs Fitted for Model with Interaction between age and bmi") +
+    theme_bw()
+```
+
+Kiểm tra tính tuyến tính từng phần, ta sử dụng biểu đồ thặng dư từng phần (partial residual plots)
+
+```{r}
+terms_md <- predict(linear_model, type='term')
+```
+
+
+```{r}
+head(terms_md)
+```
+
+
+```{r}
+# xác định thặng dư từng phần
+partial_residual_md <- residuals(linear_model, type='partial')
+head(partial_residual_md)
+```
+
+
+```{r}
+# hàm vẽ biểu đồ thặng dư cho từng biến
+plot_partial_residual <- function(data, terms, partial_resid, variable) {
+    data_part_resid <- tibble(
+        x = data[[variable]],
+        terms_x = terms[, variable],
+        partial_resid_x = partial_resid[, variable]
+    )
+    plot <- ggplot(data_part_resid, mapping = aes(x, partial_resid_x)) +
+        geom_point() +
+        geom_smooth(method = "loess", se = FALSE, linetype = "dashed", color = "forestgreen") +
+        geom_line(aes(x = x, y = terms_x), color = "blue") +
+        labs(x = variable, y = "Partial Residuals") +
+        theme_bw()
+    return(plot)
+}
+```
+
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "age")
+```
+
+Đường thẳng tuyến tính (màu xanh dương) ước lượng không khớp với dữ liệu. Underestimate trong khoảng từ bé hơn 23 và lớn hơn 68
+
+Đường cong nét đứt (màu xanh lá) cho thấy xu hướng mối quan hệ phi tuyến tính của biến `age` và `health_score`
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "bmi")
+```
+
+Đường thẳng tuyến tính (màu xanh dương) ước lượng không khớp với dữ liệu. Underestimate trong khoảng từ bé hơn 17 và lớn hơn 34
+
+Đường cong nét đứt (màu xanh lá) cho thấy xu hướng mối quan hệ phi tuyến tính của biến `bmi` và `health_score`
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "exercise_frequency")
+```
+
+Kết quả cho thấy đường thẳng tuyến tính (màu xanh dương) ước lượng tương đối khớp với dữ liệu
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "diet_quality")
+```
+
+Đường thẳng tuyến tính (màu xanh dương) ước lượng không khớp với dữ liệu. Underestimate trong khoảng từ bé hơn 60 và lớn hơn 90
+
+Đường cong nét đứt (màu xanh lá) cho thấy xu hướng mối quan hệ phi tuyến tính của biến `diet_quality` và `health_score`
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "sleep_hours")
+```
+
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "smoking_status")
+```
+
+
+```{r}
+plot_partial_residual(data, terms_md, partial_residual_md, variable = "alcohol_consumption")
+```
+
+Kết quả cho thấy đường thẳng tuyến tính (màu xanh dương) ước lượng tương đối khớp với dữ liệu
+Hình vẽ cho thấy xu hướng đường cong màu xanh lá rất đáng kể, giả định về tính tuyến tính của mô hình là không rõ ràng
+
+```{r}
+model_interaction = lm(formula = sales ~ tv*radio + newspaper, data=data) # chỉnh fomular và các biến cần plot
+terms_md_interaction <- predict(model_interaction, type='term')
+
+# Calculate partial residuals for the interaction model
+partial_residual_md_interaction <- residuals(model_interaction, type='partial')
+
+
+plot_partial_residual(data, terms_md_interaction, partial_residual_md_interaction, variable = "tv")
+plot_partial_residual(data, terms_md_interaction, partial_residual_md_interaction, variable = "radio")
+plot_partial_residual(data, terms_md_interaction, partial_residual_md_interaction, variable = "newspaper")
+```
+
+Kiểm tra đồng nhất phương sai, ta sử dụng biểu đồ **Scale-Location**
+
+```{r}
+library(gridExtra)
+
+variance_check<- function(model) {
+    p1 <- ggplot(data = model, mapping = aes(x = .fitted, y = .resid)) +
+        geom_point() +
+        geom_smooth(method = "loess", se = FALSE) +
+        geom_hline(yintercept = 0, linetype = "dashed") +
+        labs(x = "Fitted values", y = "Residuals") +
+        theme_bw()
+
+    p2 <- ggplot(data = model, mapping = aes(x = .fitted, y = sqrt(abs(.stdresid)))) +
+        geom_point(na.rm = TRUE) +
+        geom_smooth(method = "loess", se = FALSE, na.rm = TRUE) +
+        labs(x = "Fitted Values", y = expression(sqrt("|Standardized residuals|"))) +
+        theme_bw()
+
+    grid.arrange(p1, p2, nrow = 1, ncol = 2)
+}
+```
+
+
+```{r}
+variance_check(linear_model)
+```
+
+Kiểm tra riêng từng biến
+
+```{r}
+diet_quality_md <- lm(health_score ~ alcohol_consumption, data=data)
+variance_check(diet_quality_md)
+```
+
+Nhìn vào biểu đồ Scale-Location ta thấy xu hướng của dữ liệu không xấp xỉ đường thẳng 1 $\to$ ám chỉ phương sai thặng dư là không đồng nhất 
+Kiểm tra ngoại lại trong mô hình, ta dùng biểu đồ Residuals vs Leverage
+
+```{r}
+ggplot(linear_model, aes(.hat, .stdresid)) +
+    geom_point(aes(size = .cooksd)) +
+    xlab("Leverage") + ylab("Standardized Residuals") +
+    scale_size_continuous("Cook's Distance", range = c(1, 6)) +
+    theme_bw() +
+    theme(legend.position = "bottom")
+```
+
+
+```{r}
+std_resid_md <- rstandard(linear_model)
+hat_values_md <- hatvalues(linear_model)
+cooks_D_md <- cooks.distance(linear_model)
+```
+
+
+```{r}
+data_cooks_md_adv <- tibble(id_point = 1:nrow(data),
+                            rstand = std_resid_md, hats = hat_values_md,
+                            cooks = cooks_D_md, health_score = data$health_score) # chỉnh biến mục tiêu
+data_cooks_md_adv |> arrange(desc(cooks))
+```
+
+Kiểm tra tính đa cộng tuyến, ta tính hệ số lạm phát phương sai VIF của từng biến trong mô hình
+
+$$
+\text{VIF} = \frac{1}{1-R^2_{X_j | X\_j}}
+$$
+
+```{r}
+vif_values <- vif(linear_model)
+vif_df <- data.frame(VIF = vif_values)
+print(vif_df)
+```
+
+Nhận xét: ....
